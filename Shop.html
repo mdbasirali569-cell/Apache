@@ -1,1 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apache Shop - Category</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
 
+    <div class="nav-container">
+        <nav class="liquid-nav">
+            <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="shop.html" class="nav-item active"><i class="fa-solid fa-list"></i> Category</a>
+            <a href="cart.html" class="nav-item"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
+            <a href="account.html" class="nav-item"><i class="fa-solid fa-user"></i> Account</a>
+        </nav>
+    </div>
+
+    <div class="search-container">
+        <div class="liquid-search-bar">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Filter categories...">
+            <button class="search-btn">Filter</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2 class="section-title">Product Categories</h2>
+        <div class="products-grid">
+            <div class="product-card">
+                <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=500&q=80" alt="Product" class="product-img">
+                <div class="product-info">
+                    <h3 class="product-title">Wireless Headphones</h3>
+                    <div class="product-price">$99.00</div>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+            <div class="product-card">
+                <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=500&q=80" alt="Product" class="product-img">
+                <div class="product-info">
+                    <h3 class="product-title">Minimalist Watch</h3>
+                    <div class="product-price">$149.00</div>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Apache Shop. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
