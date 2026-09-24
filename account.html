@@ -9,27 +9,24 @@
 </head>
 <body>
 
-    <div class="nav-container">
-        <nav class="liquid-nav">
-            <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i> Home</a>
-            <a href="shop.html" class="nav-item"><i class="fa-solid fa-list"></i> Category</a>
-            <a href="cart.html" class="nav-item"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
-            <a href="account.html" class="nav-item active"><i class="fa-solid fa-user"></i> Account</a>
-        </nav>
-    </div>
-
     <div class="container">
         <h2 class="section-title">User Account</h2>
-        <div class="account-box" style="background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); padding: 30px; border-radius: 15px; max-width: 400px; margin: 0 auto; text-align: center;">
+        <div style="background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); padding: 30px; border-radius: 15px; max-width: 400px; margin: 0 auto; text-align: center;">
             <p style="margin-bottom: 15px; font-weight: bold;">Login or Register</p>
             <input type="email" placeholder="Enter your email" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #ccc;">
             <button class="btn" style="width: 100%;">Submit</button>
         </div>
     </div>
 
-    <footer>
-        <p>&copy; 2026 Apache Shop. All rights reserved.</p>
-    </footer>
+    <!-- Bottom Liquid Glass Navigation Bar -->
+    <div class="nav-container-bottom">
+        <nav class="liquid-nav">
+            <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i><span>Home</span></a>
+            <a href="shop.html" class="nav-item"><i class="fa-solid fa-list"></i><span>Category</span></a>
+            <a href="cart.html" class="nav-item"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span> <span id="cartCount" class="badge">0</span></a>
+            <a href="account.html" class="nav-item active"><i class="fa-solid fa-user"></i><span>Account</span></a>
+        </nav>
+    </div>
 
     <script src="script.js"></script>
 </body>
