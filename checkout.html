@@ -1,1 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apache Shop - Checkout</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
 
+    <div class="container">
+        <h2 class="section-title">Checkout & Shipping</h2>
+        
+        <div class="checkout-wrapper" style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); padding: 30px; border-radius: 16px; max-width: 600px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.08);">
+            
+            <!-- Order Summary Preview -->
+            <div id="checkoutSummary" style="margin-bottom: 25px; border-bottom: 1px solid #ddd; padding-bottom: 15px;">
+                <h3 style="font-size: 18px; margin-bottom: 10px; color: #333;">Order Summary</h3>
+                <div id="checkoutItemsList">Loading items...</div>
+            </div>
+
+            <!-- Checkout Form -->
+            <form onsubmit="placeOrder(event)">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-size: 14px; margin-bottom: 5px; font-weight: 500;">Full Name</label>
+                    <input type="text" id="fullName" placeholder="Apnar nam" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; outline: none;">
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-size: 14px; margin-bottom: 5px; font-weight: 500;">Phone Number</label>
+                    <input type="tel" id="phoneNumber" placeholder="01XXXXXXXXX" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; outline: none;">
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-size: 14px; margin-bottom: 5px; font-weight: 500;">Delivery Address</label>
+                    <textarea id="deliveryAddress" placeholder="Basha ba office-er thikana, area, city..." rows="3" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; outline: none;"></textarea>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-size: 14px; margin-bottom: 5px; font-weight: 500;">Payment Method</label>
+                    <select id="paymentMethod" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; outline: none;">
+                        <option value="cod">Cash on Delivery (COD)</option>
+                        <option value="bkash">bKash Send Money</option>
+                        <option value="nagad">Nagad</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn" style="width: 100%; padding: 12px; font-size: 16px; border-radius: 8px;">Confirm Order</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bottom Liquid Glass Navigation Bar -->
+    <div class="nav-container-bottom">
+        <nav class="liquid-nav">
+            <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i><span>Home</span></a>
+            <a href="shop.html" class="nav-item"><i class="fa-solid fa-list"></i><span>Category</span></a>
+            <a href="cart.html" class="nav-item"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span> <span id="cartCount" class="badge">0</span></a>
+            <a href="account.html" class="nav-item"><i class="fa-solid fa-user"></i><span>Account</span></a>
+        </nav>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Load checkout summary on page load
+        document.addEventListener("DOMContentLoaded", () => {
+            loadCheckoutSummary();
+        });
+
+        function loadCheckoutSummary() {
+            let container = document.getElementById('checkoutItemsList');
+            let cart = JSON.parse(localStorage.getItem('apacheCart')) || [];
+
+            if (cart.length === 0) {
+                container.innerHTML = '<p style="color: #777;">Cart-e kono product nei.</p>';
+                return;
+            }
+
+            let html = '<ul style="list-style: none; padding: 0; font-size: 14px;">';
+            let total = 0;
+            cart.forEach(item => {
+                let subTotal = item.price * item.quantity;
+                total += subTotal;
+                html += `<li style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>${item.name} (x${item.quantity})</span>
+                            <span>$${subTotal}</span>
+                         </li>`;
+            });
+            html += `</ul><div style="text-align: right; font-weight: bold; margin-top: 10px; font-size: 16px;">Total: $${total}</div>`;
+            container.innerHTML = html;
+        }
+
+        function placeOrder(event) {
+            event.preventDefault();
+            let name = document.getElementById('fullName').value;
+            let phone = document.getElementById('phoneNumber').value;
+            let address = document.getElementById('deliveryAddress').value;
+            let payment = document.getElementById('paymentMethod').value;
+
+            let cart = JSON.parse(localStorage.getItem('apacheCart')) || [];
+            if (cart.length ===50 && cart.length === 0) { // check if empty
+                alert("Apnar cart khali!");
+                return;
+            }
+
+            alert("Dhonnobad " + name + "! Apnar order-ti safoltar sathe গ্রহণ kora hoyeche. Khub sheghroi apnar kache call asbe.");
+            localStorage.removeItem('apacheCart'); // Clear cart after order
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>
