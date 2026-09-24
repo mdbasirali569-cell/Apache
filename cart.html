@@ -19,7 +19,7 @@
         <!-- Total Price & Checkout Button Area -->
         <div id="cartFooter" style="text-align: right; max-width: 600px; margin: 0 auto; display: none;">
             <div id="cartTotal" style="font-size: 18px; font-weight: bold; margin-bottom: 15px;"></div>
-            <a href="checkout.html" class="btn" style="display: inline-block; padding: 12px 30px; text-decoration: none; border-radius: 8px; font-size: 16px;">Proceed to Checkout</a>
+            <button onclick="goToCheckout()" class="btn" style="display: inline-block; padding: 12px 30px; border: none; cursor: pointer; border-radius: 8px; font-size: 16px;">Proceed to Checkout</button>
         </div>
     </div>
 
@@ -35,7 +35,6 @@
 
     <script src="script.js"></script>
     <script>
-        // Additional script to show/hide checkout button based on cart items
         document.addEventListener("DOMContentLoaded", () => {
             let cart = JSON.parse(localStorage.getItem('apacheCart')) || [];
             let cartFooter = document.getElementById('cartFooter');
@@ -43,6 +42,10 @@
                 cartFooter.style.display = "block";
             }
         });
+
+        function goToCheckout() {
+            window.location.href = "checkout.html";
+        }
     </script>
 </body>
 </html>
