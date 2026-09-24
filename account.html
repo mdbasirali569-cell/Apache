@@ -8,49 +8,57 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            background-color: #0b0f19;
+            background: linear-gradient(135deg, #0b0f19 0%, #111827 100%);
             color: #f8fafc;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding-bottom: 110px;
+            min-height: 100vh;
         }
         .auth-container {
             width: 100%;
-            max-width: 400px;
-            margin: 30px auto 20px auto;
-            padding: 30px;
-            background: rgba(17, 24, 39, 0.7);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            max-width: 410px;
+            margin: 35px auto 20px auto;
+            padding: 35px 28px;
+            background: rgba(17, 24, 39, 0.65);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 28px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
             box-sizing: border-box;
             text-align: center;
         }
+        /* Cute Husky Avatar Styling */
         .avatar-container {
-            width: 85px;
-            height: 85px;
-            margin: 0 auto 15px auto;
-            background: #1e293b;
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 18px auto;
+            background: radial-gradient(circle, #1e293b 0%, #0f172a 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
-            border: 2px solid rgba(255,255,255,0.1);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-            overflow: hidden;
+            font-size: 45px;
+            border: 2px solid rgba(59, 130, 246, 0.4);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+            animation: floatAvatar 4s ease-in-out infinite;
+        }
+        @keyframes floatAvatar {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
         }
         .auth-title {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 700;
             margin-bottom: 6px;
             color: #ffffff;
+            letter-spacing: -0.5px;
         }
         .auth-subtitle {
             font-size: 13px;
             color: #94a3b8;
-            margin-bottom: 22px;
+            margin-bottom: 24px;
         }
         .input-group {
             margin-bottom: 16px;
@@ -58,33 +66,46 @@
             flex-direction: column;
             text-align: left;
             gap: 6px;
+            position: relative;
         }
         .input-group label {
-            font-size: 13px;
+            font-size: 12px;
+            font-weight: 500;
             color: #cbd5e1;
+            margin-left: 4px;
         }
         .input-group input {
             width: 100%;
-            padding: 13px 16px;
-            background: rgba(15, 23, 42, 0.7);
+            padding: 14px 16px;
+            background: rgba(11, 15, 25, 0.75);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
+            border-radius: 14px;
             color: #fff;
             font-size: 14px;
             outline: none;
             box-sizing: border-box;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
         }
         .input-group input:focus {
             border-color: #3b82f6;
+            background: rgba(11, 15, 25, 0.95);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        }
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 40px;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 15px;
         }
         .auth-options {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 13px;
+            font-size: 12px;
             color: #94a3b8;
-            margin-bottom: 20px;
+            margin: 18px 0 22px 0;
         }
         .auth-options label {
             display: flex;
@@ -95,21 +116,28 @@
         .auth-options a {
             color: #60a5fa;
             text-decoration: none;
+            transition: color 0.2s;
+        }
+        .auth-options a:hover {
+            color: #93c5fd;
         }
         .auth-btn {
             width: 100%;
-            padding: 13px;
-            background: #ffffff;
+            padding: 14px;
+            background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
             color: #0f172a;
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s, transform 0.1s;
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
         }
         .auth-btn:hover {
-            background: #e2e8f0;
+            background: linear-gradient(135deg, #f8fafc, #cbd5e1);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(255, 255, 255, 0.25);
         }
         .auth-btn:active {
             transform: scale(0.98);
@@ -118,28 +146,28 @@
             display: flex;
             align-items: center;
             text-align: center;
-            margin: 20px 0;
+            margin: 22px 0;
             color: #64748b;
             font-size: 12px;
         }
         .divider::before, .divider::after {
             content: '';
             flex: 1;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
         .divider::before { margin-right: .75em; }
         .divider::after { margin-left: .75em; }
         
         .social-buttons {
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
         .social-btn {
             flex: 1;
-            padding: 11px;
-            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
+            border-radius: 14px;
             color: #fff;
             font-size: 14px;
             font-weight: 500;
@@ -148,13 +176,15 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
         }
         .social-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.09);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
         }
         .register-link {
-            margin-top: 20px;
+            margin-top: 22px;
             font-size: 13px;
             color: #94a3b8;
         }
@@ -162,6 +192,9 @@
             color: #ffffff;
             text-decoration: none;
             font-weight: 600;
+        }
+        .register-link a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -183,6 +216,7 @@
             <div class="input-group">
                 <label>Password</label>
                 <input type="password" id="loginPassword" placeholder="••••••••" required>
+                <i class="fa-regular fa-eye password-toggle" id="togglePassword"></i>
             </div>
             
             <div class="auth-options">
@@ -219,5 +253,17 @@
         </nav>
     </div>
 
+    <script>
+        // Password visibility toggle feature
+        const togglePassword = document.getElementById('togglePassword');
+        const loginPassword = document.getElementById('loginPassword');
+
+        togglePassword.addEventListener('click', function () {
+            const type = loginPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+            loginPassword.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    </script>
 </body>
 </html>
