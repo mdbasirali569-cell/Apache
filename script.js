@@ -6,12 +6,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Search functionality
 function searchProducts() {
-    let input = document.getElementById('searchInput').value.toLowerCase();
+    let input = document.getElementById('searchInput');
+    if (!input) return;
+    let filter = input.value.toLowerCase();
     let cards = document.querySelectorAll('.product-card');
 
     cards.forEach(card => {
         let name = card.getAttribute('data-name').toLowerCase();
-        if (name.includes(input)) {
+        if (name.includes(filter)) {
             card.style.display = "block";
         } else {
             card.style.display = "none";
@@ -23,7 +25,6 @@ function searchProducts() {
 function addToCart(name, price) {
     let cart = JSON.parse(localStorage.getItem('apacheCart')) || [];
     
-    // Check if product already exists
     let existingItem = cart.find(item => item.name === name);
     if (existingItem) {
         existingItem.quantity += 1;
@@ -64,7 +65,7 @@ function displayCartItems() {
     let html = '<ul style="list-style: none; padding: 0;">';
     let totalPrice = 0;
 
-    cart.forEach((item, index) => {
+    cart.forEach((item) => {
         let itemTotal = item.price * item.quantity;
         totalPrice += itemTotal;
         html += `<li style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ddd;">
@@ -78,4 +79,28 @@ function displayCartItems() {
     if (totalContainer) {
         totalContainer.innerHTML = `Total Price: $${totalPrice}`;
     }
+}
+
+// Password Visibility Toggle for Account Page (Video Feature)
+function togglePasswordVisibility() {
+    let passwordInput = document.getElementById('passwordInput');
+    let toggleIcon = document.getElementById('togglePassword');
+    
+    if (!passwordInput || !toggleIcon) return;
+
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    }
+}
+
+// Handle Login Form Submit Simulation
+function handleLogin(event) {
+    event.preventDefault();
+    alert("Successfully Signed in to Lunara!");
 }
