@@ -1,147 +1,99 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apache Shop - Checkout</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
+<!-- Firebase App SDK & Firestore CDN (Compat version for easy HTML integration) -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-    <div class="container" style="padding-bottom: 90px;">
-        <h2 class="section-title">Checkout & Shipping</h2>
-        
-        <div class="checkout-wrapper" style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); padding: 30px; border-radius: 16px; max-width: 600px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.08);">
-            
-            <!-- Order Summary Preview -->
-            <div id="checkoutSummary" style="margin-bottom: 25px; border-bottom: 1px solid #ddd; padding-bottom: 15px;">
-                <h3 style="font-size: 18px; margin-bottom: 10px; color: #333;">Order Summary</h3>
-                <div id="checkoutItemsList">Loading items...</div>
-            </div>
+<script>
+    // Apnar Firebase configuration (Project settings theke pawa)
+    const firebaseConfig = {
+        apiKey: "AIzaSyDqPVV6VIhZvUH7o6R98lIpf61JtG7B6bU",
+        authDomain: "apache-shop.firebaseapp.com",
+        projectId: "apache-shop",
+        storageBucket: "apache-shop.appspot.com",
+        messagingSenderId: "40961890999",
+        appId: "1:40961890999:web:cc3e09d9bd47990597cb32",
+        measurementId: "G-18W9KDF336"
+    };
 
-            <!-- Checkout Form -->
-            <form onsubmit="placeOrder(event)">
-                <div style="margin-bottom: 15px;">
-                    <label style="display: block; font-size: 14px; margin-bottom: 5px; font-weight: 500;">Full Name</label>
-                    <input type="text" id="fullName" placeholder="Apnar nam" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; outline: none;">
-                </div>
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-                <div style="margin-bottom: 15px;">
-                    <label style="display: block; font-size: 14px; margin-bottom: 5px; font-weight: 500;">Phone Number</label>
-                    <input type="tel" id="phoneNumber" placeholder="01XXXXXXXXX" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; outline: none;">
-                </div>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadCheckoutSummary();
+    });
 
-                <div style="margin-bottom: 15px;">
-                    <label style="display: block; font-size: 14px; margin-bottom: 5px; font-weight: 500;">Delivery Address</label>
-                    <textarea id="deliveryAddress" placeholder="Basha ba office-er thikana, area, city..." rows="3" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; outline: none;"></textarea>
-                </div>
+    function loadCheckoutSummary() {
+        let container = document.getElementById('checkoutItemsList');
+        let cart = JSON.parse(localStorage.getItem('apacheCart')) || [];
 
-                <div style="margin-bottom: 15px;">
-                    <label style="display: block; font-size: 14px; margin-bottom: 5px; font-weight: 500;">Payment Method</label>
-                    <select id="paymentMethod" onchange="togglePaymentFields()" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; outline: none;">
-                        <option value="cod">Cash on Delivery (COD)</option>
-                        <option value="bkash">bKash (Send Money: 01XXXXXXXXX)</option>
-                        <option value="nagad">Nagad (Send Money: 01XXXXXXXXX)</option>
-                    </select>
-                </div>
+        if (cart.length === 0) {
+            container.innerHTML = '<p style="color: #777;">Cart-e kono product nei.</p>';
+            return;
+        }
 
-                <!-- Dynamic Transaction ID Field for bKash/Nagad -->
-                <div id="trxContainer" style="margin-bottom: 20px; display: none;">
-                    <label style="display: block; font-size: 14px; margin-bottom: 5px; font-weight: 500; color: #d97706;">Transaction ID (TrxID)</label>
-                    <input type="text" id="trxId" placeholder="e.g. 9H7K3L2M1" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #d97706; outline: none; background: #fffbeb;">
-                    <small style="color: #666; font-size: 12px;">Payment korar por pawa TrxID ti ekhane din.</small>
-                </div>
-
-                <button type="submit" class="btn" style="width: 100%; padding: 12px; font-size: 16px; border-radius: 8px; background: #ff6f61; color: white; border: none; cursor: pointer;">Confirm Order</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Bottom Liquid Glass Navigation Bar -->
-    <div class="nav-container-bottom">
-        <nav class="liquid-nav">
-            <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i><span>Home</span></a>
-            <a href="shop.html" class="nav-item"><i class="fa-solid fa-list"></i><span>Category</span></a>
-            <a href="cart.html" class="nav-item"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span> <span id="cartCount" class="badge">0</span></a>
-            <a href="account.html" class="nav-item"><i class="fa-solid fa-user"></i><span>Account</span></a>
-        </nav>
-    </div>
-
-    <script src="script.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            loadCheckoutSummary();
+        let html = '<ul style="list-style: none; padding: 0; font-size: 14px;">';
+        let total = 0;
+        cart.forEach(item => {
+            let subTotal = item.price * item.quantity;
+            total += subTotal;
+            html += `<li style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span>${item.name} (x${item.quantity})</span>
+                        <span>$${subTotal}</span>
+                     </li>`;
         });
+        html += `</ul><div style="text-align: right; font-weight: bold; margin-top: 10px; font-size: 16px;">Total: $${total}</div>`;
+        container.innerHTML = html;
+    }
 
-        function loadCheckoutSummary() {
-            let container = document.getElementById('checkoutItemsList');
-            let cart = JSON.parse(localStorage.getItem('apacheCart')) || [];
+    function togglePaymentFields() {
+        let method = document.getElementById('paymentMethod').value;
+        let trxContainer = document.getElementById('trxContainer');
+        let trxInput = document.getElementById('trxId');
 
-            if (cart.length === 0) {
-                container.innerHTML = '<p style="color: #777;">Cart-e kono product nei.</p>';
-                return;
-            }
+        if (method === 'bkash' || method === 'nagad') {
+            trxContainer.style.display = "block";
+            trxInput.required = true;
+        } else {
+            trxContainer.style.display = "none";
+            trxInput.required = false;
+        }
+    }
 
-            let html = '<ul style="list-style: none; padding: 0; font-size: 14px;">';
-            let total = 0;
-            cart.forEach(item => {
-                let subTotal = item.price * item.quantity;
-                total += subTotal;
-                html += `<li style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                            <span>${item.name} (x${item.quantity})</span>
-                            <span>$${subTotal}</span>
-                         </li>`;
-            });
-            html += `</ul><div style="text-align: right; font-weight: bold; margin-top: 10px; font-size: 16px;">Total: $${total}</div>`;
-            container.innerHTML = html;
+    // Place Order and Save directly to Firebase Firestore Database
+    function placeOrder(event) {
+        event.preventDefault();
+        let name = document.getElementById('fullName').value;
+        let phone = document.getElementById('phoneNumber').value;
+        let address = document.getElementById('deliveryAddress').value;
+        let payment = document.getElementById('paymentMethod').value;
+        let trxId = document.getElementById('trxId').value;
+
+        let cart = JSON.parse(localStorage.getItem('apacheCart')) || [];
+        if (cart.length === 0) {
+            alert("Apnar cart khali!");
+            return;
         }
 
-        // Show/Hide TrxID field based on payment choice
-        function togglePaymentFields() {
-            let method = document.getElementById('paymentMethod').value;
-            let trxContainer = document.getElementById('trxContainer');
-            let trxInput = document.getElementById('trxId');
+        let orderData = {
+            customerName: name,
+            phone: phone,
+            address: address,
+            paymentMethod: payment,
+            trxId: payment === 'cod' ? 'Cash on Delivery' : trxId,
+            items: cart,
+            orderDate: new Date().toLocaleString()
+        };
 
-            if (method === 'bkash' || method === 'nagad') {
-                trxContainer.style.display = "block";
-                trxInput.required = true;
-            } else {
-                trxContainer.style.display = "none";
-                trxInput.required = false;
-            }
-        }
-
-        function placeOrder(event) {
-            event.preventDefault();
-            let name = document.getElementById('fullName').value;
-            let phone = document.getElementById('phoneNumber').value;
-            let address = document.getElementById('deliveryAddress').value;
-            let payment = document.getElementById('paymentMethod').value;
-            let trxId = document.getElementById('trxId').value;
-
-            let cart = JSON.parse(localStorage.getItem('apacheCart')) || [];
-            if (cart.length === 0) {
-                alert("Apnar cart khali!");
-                return;
-            }
-
-            let orderDetails = {
-                name: name,
-                phone: phone,
-                address: address,
-                paymentMethod: payment,
-                trxId: payment === 'cod' ? 'N/A' : trxId,
-                items: cart
-            };
-
-            // Console log or save simulation
-            console.log("New Order Placed:", orderDetails);
-
-            alert("Dhonnobad " + name + "! Apnar order-ti safoltar sathe confirm kora hoyeche. Khub sheghroi apnar kache confirmation call asbe.");
+        // Save data to Firebase Firestore 'orders' collection
+        db.collection("orders").add(orderData)
+        .then((docRef) => {
+            alert("Dhonnobad " + name + "! Apnar order-ti safoltar sathe database-e save hoyeche. Order ID: " + docRef.id);
             localStorage.removeItem('apacheCart');
             window.location.href = "index.html";
-        }
-    </script>
-</body>
-</html>
+        })
+        .catch((error) => {
+            console.error("Error adding order: ", error);
+            alert("Order save korte somossa hocche. Internet connection check korun.");
+        });
+    }
+</script>
