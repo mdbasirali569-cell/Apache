@@ -39,65 +39,63 @@
         </nav>
     </div>
 
-    <!-- Firebase SDKs -->
+    <!-- Firebase SDKs & Logic -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addfDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+      import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
-        // Apnar Firebase configuration keys
-        const firebaseConfig = {
-            apiKey: "AIzaSyDcmpvG4VihzVUHT7O8K98...", // Apnar config key ekhane thakbe
-            authDomain: "apache-shop.firebaseapp.com",
-            projectId: "apache-shop",
-            storageBucket: "apache-shop.appspot.com",
-            messagingSenderId: "40961890999",
-            appId: "1:40961890999:web:cn3e09d9bd47990597cb32"
-        };
+      const firebaseConfig = {
+        apiKey: "AIzaSyCDm9zVG4V1hzVUHt7o6RK9NzWzVblh5Hs",
+        authDomain: "apache-shop.firebaseapp.com",
+        projectId: "apache-shop",
+        storageBucket: "apache-shop.firebasestorage.app",
+        messagingSenderId: "40961890999",
+        appId: "1:40961890999:web:5db3dc1001c1e81a97cb32",
+        measurementId: "G-ZLH2D7NN4D"
+      };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
 
-        // Load cart summary on checkout page
-        document.addEventListener("DOMContentLoaded", () => {
-            let cart = JSON.parse(localStorage.getItem('apacheCart')) || [];
-            let container = document.getElementById('checkoutItems');
-            let totalContainer = document.getElementById('checkoutTotal');
-            
-            if(cart.length === 0) {
-                container.innerHTML = "<p>Your cart is empty.</p>";
-                return;
-            }
+      document.addEventListener("DOMContentLoaded", () => {
+          let cart = JSON.parse(localStorage.getItem('apacheCart')) || [];
+          let container = document.getElementById('checkoutItems');
+          let totalContainer = document.getElementById('checkoutTotal');
+          
+          if(cart.length === 0) {
+              container.innerHTML = "<p>Your cart is empty.</p>";
+              return;
+          }
 
-            let html = "";
-            let totalPrice = 0;
-            cart.forEach(item => {
-                html += `<p>${item.name} (${item.price} x ${item.quantity})</p>`;
-                totalPrice += item.price * item.quantity;
-            });
-            container.innerHTML = html;
-            totalContainer.innerHTML = `Total Price: $${totalPrice}`;
+          let html = "";
+          let totalPrice = 0;
+          cart.forEach(item => {
+              html += `<p>${item.name} (${item.price} x ${item.quantity})</p>`;
+              totalPrice += item.price * item.quantity;
+          });
+          container.innerHTML = html;
+          totalContainer.innerHTML = `Total Price: $${totalPrice}`;
 
-            // Handle Order Submission
-            document.getElementById('orderForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                try {
-                    await addDoc(collection(db, "orders"), {
-                        customerName: document.getElementById('name').value,
-                        phone: document.getElementById('phone').value,
-                        address: document.getElementById('address').value,
-                        items: cart,
-                        total: totalPrice,
-                        timestamp: new Date()
-                    });
-                    alert("Order placed successfully!");
-                    localStorage.removeItem('apacheCart');
-                    window.location.href = "index.html";
-                } catch (err) {
-                    console.error("Error adding document: ", err);
-                    alert("Order failed! Please try again.");
-                }
-            });
-        });
+          document.getElementById('orderForm').addEventListener('submit', async (e) => {
+              e.preventDefault();
+              try {
+                  await addDoc(collection(db, "orders"), {
+                      customerName: document.getElementById('name').value,
+                      phone: document.getElementById('phone').value,
+                      address: document.getElementById('address').value,
+                      items: cart,
+                      total: totalPrice,
+                      timestamp: new Date()
+                  });
+                  alert("Order placed successfully!");
+                  localStorage.removeItem('apacheCart');
+                  window.location.href = "index.html";
+              } catch (err) {
+                  console.error("Error adding document: ", err);
+                  alert("Order failed! Please try again.");
+              }
+          });
+      });
     </script>
 </body>
 </html>
