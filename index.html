@@ -20,6 +20,13 @@
             margin: 0 auto;
             padding: 20px;
         }
+        .header-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: #ffffff;
+        }
         /* Product Card Styling */
         .product-card {
             background: rgba(17, 24, 39, 0.65);
@@ -97,7 +104,7 @@
 <body>
 
     <div class="main-container">
-        <h2 style="text-align: center; margin-bottom: 25px;">Featured Products</h2>
+        <h2 class="header-title">Featured Products</h2>
 
         <!-- Product 1 -->
         <div class="product-card">
@@ -111,6 +118,13 @@
             <div class="product-title">Smart Watch</div>
             <div class="product-price">$149.00</div>
             <button class="add-to-cart-btn" onclick="addToCart('Smart Watch')">Add to Cart</button>
+        </div>
+
+        <!-- Product 3 -->
+        <div class="product-card">
+            <div class="product-title">Bluetooth Speaker</div>
+            <div class="product-price">$79.00</div>
+            <button class="add-to-cart-btn" onclick="addToCart('Bluetooth Speaker')">Add to Cart</button>
         </div>
     </div>
 
@@ -132,7 +146,6 @@
 
     <script>
         function addToCart(productName) {
-            // Toast notification call
             const toast = document.getElementById('toast-container');
             const toastMsg = document.getElementById('toast-message');
             
