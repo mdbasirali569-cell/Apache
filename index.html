@@ -4,298 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apache Shop - Home</title>
-    <!-- CSS file link -->
     <link rel="stylesheet" href="style.css">
-    <!-- FontAwesome icons for search, cart, and nav items -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: #f9f9f9;
-            color: #333;
-        }
-
-        /* Liquid Glass Navigation Bar Container */
-        .nav-container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 10px 20px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .liquid-nav {
-            display: flex;
-            gap: 15px;
-            position: relative;
-        }
-
-        .nav-item {
-            background: transparent;
-            border: none;
-            color: #555;
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: 500;
-            border-radius: 30px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            z-index: 2;
-            text-decoration: none;
-        }
-
-        .nav-item i {
-            font-size: 14px;
-        }
-
-        .nav-item:hover {
-            color: #ff6f61;
-        }
-
-        .nav-item.active {
-            background: #ff6f61;
-            color: #ffffff;
-            box-shadow: 0 5px 15px rgba(255, 111, 97, 0.4);
-        }
-
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1350&q=80');
-            background-size: cover;
-            background-position: center;
-            height: 70vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            color: white;
-            padding: 0 20px;
-        }
-
-        .hero h1 {
-            font-size: 48px;
-            margin-bottom: 15px;
-        }
-
-        .hero p {
-            font-size: 18px;
-            margin-bottom: 25px;
-            max-width: 600px;
-        }
-
-        .btn {
-            background-color: #ff6f61;
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 25px;
-            font-size: 16px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background 0.3s;
-        }
-
-        .btn:hover {
-            background-color: #e65b50;
-        }
-
-        /* Featured Products Section */
-        .container {
-            max-width: 1200px;
-            margin: 50px auto;
-            padding: 0 20px;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 32px;
-            margin-bottom: 40px;
-            color: #222;
-        }
-
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-        }
-
-        .product-card {
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            transition: transform 0.3s;
-        }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .product-img {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-        }
-
-        .product-info {
-            padding: 20px;
-            text-align: center;
-        }
-
-        .product-title {
-            font-size: 18px;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .product-price {
-            font-size: 16px;
-            color: #ff6f61;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-
-        .add-to-cart {
-            background: #333;
-            color: white;
-            padding: 8px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .add-to-cart:hover {
-            background: #ff6f61;
-        }
-
-        /* Footer */
-        footer {
-            background-color: #222;
-            color: #fff;
-            text-align: center;
-            padding: 30px 20px;
-            margin-top: 50px;
-        }
-
-        footer p {
-            font-size: 14px;
-            color: #aaa;
-        }
-    </style>
 </head>
 <body>
 
-    <!-- Liquid Glass Navigation Bar with 4 Custom Bars -->
+    <!-- Liquid Glass Navigation Bar -->
     <div class="nav-container">
         <nav class="liquid-nav">
-            <!-- 1. Home Bar -->
-            <button class="nav-item active" onclick="setActive(this)">
-                <i class="fa-solid fa-house"></i> Home
-            </button>
-            
-            <!-- 2. Category Bar -->
-            <button class="nav-item" onclick="setActive(this)">
-                <i class="fa-solid fa-list"></i> Category
-            </button>
-            
-            <!-- 3. Cart Bar -->
-            <button class="nav-item" onclick="setActive(this)">
-                <i class="fa-solid fa-cart-shopping"></i> Cart
-            </button>
-            
-            <!-- 4. Account Bar -->
-            <button class="nav-item" onclick="setActive(this)">
-                <i class="fa-solid fa-user"></i> Account
-            </button>
+            <a href="index.html" class="nav-item active"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="shop.html" class="nav-item"><i class="fa-solid fa-list"></i> Category</a>
+            <a href="cart.html" class="nav-item"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
+            <a href="account.html" class="nav-item"><i class="fa-solid fa-user"></i> Account</a>
         </nav>
+    </div>
+
+    <!-- Liquid Glass Search Bar Section -->
+    <div class="search-container">
+        <div class="liquid-search-bar">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Search products, categories...">
+            <button class="search-btn">Search</button>
+        </div>
     </div>
 
     <!-- Hero Section -->
     <section class="hero">
-        <h1>Discover Amazing Products</h1>
-        <p>Shop the latest trends with unbeatable prices and fast delivery right to your door.</p>
-        <a href="#" class="btn">Shop Now</a>
+        <h1>Welcome To Apache Shop</h1>
+        <p>Discover amazing products with liquid glass design and seamless shopping experience.</p>
+        <a href="shop.html" class="btn">Shop Now</a>
     </section>
 
-    <!-- Featured Products Section -->
-    <div class="container">
-        <h2 class="section-title">Featured Products</h2>
-        <div class="products-grid">
-            
-            <!-- Product 1 -->
-            <div class="product-card">
-                <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=500&q=80" alt="Product" class="product-img">
-                <div class="product-info">
-                    <h3 class="product-title">Wireless Headphones</h3>
-                    <div class="product-price">$99.00</div>
-                    <button class="add-to-cart">Add to Cart</button>
-                </div>
-            </div>
-
-            <!-- Product 2 -->
-            <div class="product-card">
-                <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=500&q=80" alt="Product" class="product-img">
-                <div class="product-info">
-                    <h3 class="product-title">Minimalist Watch</h3>
-                    <div class="product-price">$149.00</div>
-                    <button class="add-to-cart">Add to Cart</button>
-                </div>
-            </div>
-
-            <!-- Product 3 -->
-            <div class="product-card">
-                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=500&q=80" alt="Product" class="product-img">
-                <div class="product-info">
-                    <h3 class="product-title">Sport Running Shoes</h3>
-                    <div class="product-price">$79.00</div>
-                    <button class="add-to-cart">Add to Cart</button>
-                </div>
-            </div>
-
-            <!-- Product 4 -->
-            <div class="product-card">
-                <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=500&q=80" alt="Product" class="product-img">
-                <div class="product-info">
-                    <h3 class="product-title">Vintage Camera</h3>
-                    <div class="product-price">$299.00</div>
-                    <button class="add-to-cart">Add to Cart</button>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- Footer -->
     <footer>
         <p>&copy; 2026 Apache Shop. All rights reserved.</p>
     </footer>
 
-    <!-- JavaScript for Navigation Tab Switching -->
-    <script>
-        function setActive(button) {
-            const buttons = document.querySelectorAll('.nav-item');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
