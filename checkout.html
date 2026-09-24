@@ -1,99 +1,103 @@
-<!-- Firebase App SDK & Firestore CDN (Compat version for easy HTML integration) -->
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apache Shop - Checkout</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
 
-<script>
-    // Apnar Firebase configuration (Project settings theke pawa)
-    const firebaseConfig = {
-        apiKey: "AIzaSyDqPVV6VIhZvUH7o6R98lIpf61JtG7B6bU",
-        authDomain: "apache-shop.firebaseapp.com",
-        projectId: "apache-shop",
-        storageBucket: "apache-shop.appspot.com",
-        messagingSenderId: "40961890999",
-        appId: "1:40961890999:web:cc3e09d9bd47990597cb32",
-        measurementId: "G-18W9KDF336"
-    };
+    <div class="container">
+        <h2 class="section-title">Checkout</h2>
+        
+        <div style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); padding: 25px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+            <h3>Order Summary</h3>
+            <div id="checkoutItems" style="margin: 15px 0;"></div>
+            <h4 id="checkoutTotal" style="margin-top: 15px;"></h4>
+        </div>
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+        <div style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+            <h3>Shipping Details</h3>
+            <form id="orderForm" style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
+                <input type="text" id="name" placeholder="Full Name" required style="padding: 12px; border-radius: 8px; border: 1px solid #ccc;">
+                <input type="text" id="phone" placeholder="Phone Number" required style="padding: 12px; border-radius: 8px; border: 1px solid #ccc;">
+                <textarea id="address" placeholder="Delivery Address" required style="padding: 12px; border-radius: 8px; border: 1px solid #ccc; height: 80px;"></textarea>
+                <button type="submit" class="btn" style="padding: 12px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">Place Order</button>
+            </form>
+        </div>
+    </div>
 
-    document.addEventListener("DOMContentLoaded", () => {
-        loadCheckoutSummary();
-    });
+    <!-- Bottom Navigation Bar -->
+    <div class="nav-container-bottom">
+        <nav class="liquid-nav">
+            <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i><span>Home</span></a>
+            <a href="shop.html" class="nav-item"><i class="fa-solid fa-list"></i><span>Category</span></a>
+            <a href="cart.html" class="nav-item"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span></a>
+            <a href="account.html" class="nav-item"><i class="fa-solid fa-user"></i><span>Account</span></a>
+        </nav>
+    </div>
 
-    function loadCheckoutSummary() {
-        let container = document.getElementById('checkoutItemsList');
-        let cart = JSON.parse(localStorage.getItem('apacheCart')) || [];
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addfDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        if (cart.length === 0) {
-            container.innerHTML = '<p style="color: #777;">Cart-e kono product nei.</p>';
-            return;
-        }
-
-        let html = '<ul style="list-style: none; padding: 0; font-size: 14px;">';
-        let total = 0;
-        cart.forEach(item => {
-            let subTotal = item.price * item.quantity;
-            total += subTotal;
-            html += `<li style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                        <span>${item.name} (x${item.quantity})</span>
-                        <span>$${subTotal}</span>
-                     </li>`;
-        });
-        html += `</ul><div style="text-align: right; font-weight: bold; margin-top: 10px; font-size: 16px;">Total: $${total}</div>`;
-        container.innerHTML = html;
-    }
-
-    function togglePaymentFields() {
-        let method = document.getElementById('paymentMethod').value;
-        let trxContainer = document.getElementById('trxContainer');
-        let trxInput = document.getElementById('trxId');
-
-        if (method === 'bkash' || method === 'nagad') {
-            trxContainer.style.display = "block";
-            trxInput.required = true;
-        } else {
-            trxContainer.style.display = "none";
-            trxInput.required = false;
-        }
-    }
-
-    // Place Order and Save directly to Firebase Firestore Database
-    function placeOrder(event) {
-        event.preventDefault();
-        let name = document.getElementById('fullName').value;
-        let phone = document.getElementById('phoneNumber').value;
-        let address = document.getElementById('deliveryAddress').value;
-        let payment = document.getElementById('paymentMethod').value;
-        let trxId = document.getElementById('trxId').value;
-
-        let cart = JSON.parse(localStorage.getItem('apacheCart')) || [];
-        if (cart.length === 0) {
-            alert("Apnar cart khali!");
-            return;
-        }
-
-        let orderData = {
-            customerName: name,
-            phone: phone,
-            address: address,
-            paymentMethod: payment,
-            trxId: payment === 'cod' ? 'Cash on Delivery' : trxId,
-            items: cart,
-            orderDate: new Date().toLocaleString()
+        // Apnar Firebase configuration keys
+        const firebaseConfig = {
+            apiKey: "AIzaSyDcmpvG4VihzVUHT7O8K98...", // Apnar config key ekhane thakbe
+            authDomain: "apache-shop.firebaseapp.com",
+            projectId: "apache-shop",
+            storageBucket: "apache-shop.appspot.com",
+            messagingSenderId: "40961890999",
+            appId: "1:40961890999:web:cn3e09d9bd47990597cb32"
         };
 
-        // Save data to Firebase Firestore 'orders' collection
-        db.collection("orders").add(orderData)
-        .then((docRef) => {
-            alert("Dhonnobad " + name + "! Apnar order-ti safoltar sathe database-e save hoyeche. Order ID: " + docRef.id);
-            localStorage.removeItem('apacheCart');
-            window.location.href = "index.html";
-        })
-        .catch((error) => {
-            console.error("Error adding order: ", error);
-            alert("Order save korte somossa hocche. Internet connection check korun.");
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Load cart summary on checkout page
+        document.addEventListener("DOMContentLoaded", () => {
+            let cart = JSON.parse(localStorage.getItem('apacheCart')) || [];
+            let container = document.getElementById('checkoutItems');
+            let totalContainer = document.getElementById('checkoutTotal');
+            
+            if(cart.length === 0) {
+                container.innerHTML = "<p>Your cart is empty.</p>";
+                return;
+            }
+
+            let html = "";
+            let totalPrice = 0;
+            cart.forEach(item => {
+                html += `<p>${item.name} (${item.price} x ${item.quantity})</p>`;
+                totalPrice += item.price * item.quantity;
+            });
+            container.innerHTML = html;
+            totalContainer.innerHTML = `Total Price: $${totalPrice}`;
+
+            // Handle Order Submission
+            document.getElementById('orderForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                try {
+                    await addDoc(collection(db, "orders"), {
+                        customerName: document.getElementById('name').value,
+                        phone: document.getElementById('phone').value,
+                        address: document.getElementById('address').value,
+                        items: cart,
+                        total: totalPrice,
+                        timestamp: new Date()
+                    });
+                    alert("Order placed successfully!");
+                    localStorage.removeItem('apacheCart');
+                    window.location.href = "index.html";
+                } catch (err) {
+                    console.error("Error adding document: ", err);
+                    alert("Order failed! Please try again.");
+                }
+            });
         });
-    }
-</script>
+    </script>
+</body>
+</html>
