@@ -6,46 +6,135 @@
     <title>Apache Shop - Cart</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0b0f19 0%, #111827 100%);
+            color: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding-bottom: 110px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .cart-card {
+            width: 100%;
+            max-width: 410px;
+            margin: 20px auto;
+            padding: 40px 30px;
+            background: rgba(17, 24, 39, 0.65);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 28px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            box-sizing: border-box;
+            text-align: center;
+        }
+        /* Cart Button Animation Styles */
+        .cart-btn {
+            position: relative;
+            width: 100%;
+            padding: 16px 20px;
+            background: #ffffff;
+            color: #0f172a;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+            transition: transform 0.2s ease, background 0.3s;
+        }
+        .cart-btn:hover {
+            background: #f1f5f9;
+        }
+        .cart-btn:active {
+            transform: scale(0.97);
+        }
+        .cart-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+            transition: transform 0.3s ease;
+        }
+        /* Animation class when added to cart */
+        .cart-btn.cart-animation {
+            animation: cartBtnAnim 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes cartBtnAnim {
+            0%, 100% { transform: scale(1); }
+            40% { transform: scale(0.93); background: #38bdf8; color: #fff; }
+        }
+        .cart-count-text {
+            margin-top: 25px;
+            font-size: 15px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+        .cart-count-text span {
+            color: #ffffff;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2 class="section-title">Your Shopping Cart</h2>
-        
-        <div id="cartItemsContainer" style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); padding: 25px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-            <p style="text-align: center; color: #555;">Your cart is empty.</p>
-        </div>
+    <div class="cart-card">
+        <!-- Interactive Add to Cart Button matching the video -->
+        <button class="cart-btn" id="addToCartBtn">
+            <svg viewBox="0 0 24 24">
+                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+            </svg>
+            <span class="cart-pill-label">Add to Cart</span>
+        </button>
 
-        <!-- Total Price & Checkout Button Area -->
-        <div id="cartFooter" style="text-align: right; max-width: 600px; margin: 0 auto; display: none;">
-            <div id="cartTotal" style="font-size: 18px; font-weight: bold; margin-bottom: 15px;"></div>
-            <button onclick="goToCheckout()" class="btn" style="display: inline-block; padding: 12px 30px; border: none; cursor: pointer; border-radius: 8px; font-size: 16px;">Proceed to Checkout</button>
+        <div class="cart-count-text" id="cartStatusText">
+            <span>0</span> in your cart
         </div>
     </div>
 
-    <!-- Bottom Liquid Glass Navigation Bar -->
+    <!-- Bottom Navigation Bar -->
     <div class="nav-container-bottom">
         <nav class="liquid-nav">
             <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i><span>Home</span></a>
             <a href="shop.html" class="nav-item"><i class="fa-solid fa-list"></i><span>Category</span></a>
-            <a href="cart.html" class="nav-item active"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span> <span id="cartCount" class="badge">0</span></a>
+            <a href="cart.html" class="nav-item active"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span></a>
             <a href="account.html" class="nav-item"><i class="fa-solid fa-user"></i><span>Account</span></a>
         </nav>
     </div>
 
-    <script src="script.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            let cart = JSON.parse(localStorage.getItem('apacheCart')) || [];
-            let cartFooter = document.getElementById('cartFooter');
-            if (cart.length > 0 && cartFooter) {
-                cartFooter.style.display = "block";
-            }
-        });
+        // Add to Cart interactive click animation matching video
+        const addToCartBtn = document.getElementById('addToCartBtn');
+        const cartStatusText = document.getElementById('cartStatusText');
+        let count = 0;
 
-        function goToCheckout() {
-            window.location.href = "checkout.html";
-        }
+        addToCartBtn.addEventListener('click', function() {
+            if (this.classList.contains('cart-animation')) return;
+            
+            this.classList.add('cart-animation');
+            count++;
+            
+            setTimeout(() => {
+                if(count === 1) {
+                    cartStatusText.innerHTML = `<span>${count}</span> in your cart`;
+                } else {
+                    cartStatusText.innerHTML = `<span>${count}</span> in your cart`;
+                }
+            }, 300);
+
+            setTimeout(() => {
+                this.classList.remove('cart-animation');
+            }, 800);
+        });
     </script>
 </body>
 </html>
