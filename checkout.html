@@ -9,7 +9,7 @@
 </head>
 <body>
 
-    <div class="container">
+    <div class="container" style="padding-bottom: 90px;">
         <h2 class="section-title">Checkout & Shipping</h2>
         
         <div class="checkout-wrapper" style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); padding: 30px; border-radius: 16px; max-width: 600px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.08);">
@@ -37,16 +37,23 @@
                     <textarea id="deliveryAddress" placeholder="Basha ba office-er thikana, area, city..." rows="3" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; outline: none;"></textarea>
                 </div>
 
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 15px;">
                     <label style="display: block; font-size: 14px; margin-bottom: 5px; font-weight: 500;">Payment Method</label>
-                    <select id="paymentMethod" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; outline: none;">
+                    <select id="paymentMethod" onchange="togglePaymentFields()" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; outline: none;">
                         <option value="cod">Cash on Delivery (COD)</option>
-                        <option value="bkash">bKash Send Money</option>
-                        <option value="nagad">Nagad</option>
+                        <option value="bkash">bKash (Send Money: 01XXXXXXXXX)</option>
+                        <option value="nagad">Nagad (Send Money: 01XXXXXXXXX)</option>
                     </select>
                 </div>
 
-                <button type="submit" class="btn" style="width: 100%; padding: 12px; font-size: 16px; border-radius: 8px;">Confirm Order</button>
+                <!-- Dynamic Transaction ID Field for bKash/Nagad -->
+                <div id="trxContainer" style="margin-bottom: 20px; display: none;">
+                    <label style="display: block; font-size: 14px; margin-bottom: 5px; font-weight: 500; color: #d97706;">Transaction ID (TrxID)</label>
+                    <input type="text" id="trxId" placeholder="e.g. 9H7K3L2M1" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #d97706; outline: none; background: #fffbeb;">
+                    <small style="color: #666; font-size: 12px;">Payment korar por pawa TrxID ti ekhane din.</small>
+                </div>
+
+                <button type="submit" class="btn" style="width: 100%; padding: 12px; font-size: 16px; border-radius: 8px; background: #ff6f61; color: white; border: none; cursor: pointer;">Confirm Order</button>
             </form>
         </div>
     </div>
@@ -63,7 +70,6 @@
 
     <script src="script.js"></script>
     <script>
-        // Load checkout summary on page load
         document.addEventListener("DOMContentLoaded", () => {
             loadCheckoutSummary();
         });
@@ -91,21 +97,49 @@
             container.innerHTML = html;
         }
 
+        // Show/Hide TrxID field based on payment choice
+        function togglePaymentFields() {
+            let method = document.getElementById('paymentMethod').value;
+            let trxContainer = document.getElementById('trxContainer');
+            let trxInput = document.getElementById('trxId');
+
+            if (method === 'bkash' || method === 'nagad') {
+                trxContainer.style.display = "block";
+                trxInput.required = true;
+            } else {
+                trxContainer.style.display = "none";
+                trxInput.required = false;
+            }
+        }
+
         function placeOrder(event) {
             event.preventDefault();
             let name = document.getElementById('fullName').value;
             let phone = document.getElementById('phoneNumber').value;
             let address = document.getElementById('deliveryAddress').value;
             let payment = document.getElementById('paymentMethod').value;
+            let trxId = document.getElementById('trxId').value;
 
             let cart = JSON.parse(localStorage.getItem('apacheCart')) || [];
-            if (cart.length ===50 && cart.length === 0) { // check if empty
+            if (cart.length === 0) {
                 alert("Apnar cart khali!");
                 return;
             }
 
-            alert("Dhonnobad " + name + "! Apnar order-ti safoltar sathe গ্রহণ kora hoyeche. Khub sheghroi apnar kache call asbe.");
-            localStorage.removeItem('apacheCart'); // Clear cart after order
+            let orderDetails = {
+                name: name,
+                phone: phone,
+                address: address,
+                paymentMethod: payment,
+                trxId: payment === 'cod' ? 'N/A' : trxId,
+                items: cart
+            };
+
+            // Console log or save simulation
+            console.log("New Order Placed:", orderDetails);
+
+            alert("Dhonnobad " + name + "! Apnar order-ti safoltar sathe confirm kora hoyeche. Khub sheghroi apnar kache confirmation call asbe.");
+            localStorage.removeItem('apacheCart');
             window.location.href = "index.html";
         }
     </script>
