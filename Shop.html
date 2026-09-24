@@ -9,48 +9,60 @@
 </head>
 <body>
 
-    <div class="nav-container">
-        <nav class="liquid-nav">
-            <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i> Home</a>
-            <a href="shop.html" class="nav-item active"><i class="fa-solid fa-list"></i> Category</a>
-            <a href="cart.html" class="nav-item"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
-            <a href="account.html" class="nav-item"><i class="fa-solid fa-user"></i> Account</a>
-        </nav>
-    </div>
-
     <div class="search-container">
         <div class="liquid-search-bar">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" placeholder="Filter categories...">
-            <button class="search-btn">Filter</button>
+            <input type="text" id="searchInput" placeholder="Search categories..." onkeyup="searchProducts()">
         </div>
     </div>
 
     <div class="container">
-        <h2 class="section-title">Product Categories</h2>
-        <div class="products-grid">
-            <div class="product-card">
+        <h2 class="section-title">All Categories & Products</h2>
+        <div class="products-grid" id="productGrid">
+            <div class="product-card" data-name="Wireless Headphones">
                 <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=500&q=80" alt="Product" class="product-img">
                 <div class="product-info">
                     <h3 class="product-title">Wireless Headphones</h3>
                     <div class="product-price">$99.00</div>
-                    <button class="add-to-cart">Add to Cart</button>
+                    <button class="add-to-cart" onclick="addToCart('Wireless Headphones', 99)">Add to Cart</button>
                 </div>
             </div>
-            <div class="product-card">
+            <div class="product-card" data-name="Minimalist Watch">
                 <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=500&q=80" alt="Product" class="product-img">
                 <div class="product-info">
                     <h3 class="product-title">Minimalist Watch</h3>
                     <div class="product-price">$149.00</div>
-                    <button class="add-to-cart">Add to Cart</button>
+                    <button class="add-to-cart" onclick="addToCart('Minimalist Watch', 149)">Add to Cart</button>
+                </div>
+            </div>
+            <div class="product-card" data-name="Sport Running Shoes">
+                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=500&q=80" alt="Product" class="product-img">
+                <div class="product-info">
+                    <h3 class="product-title">Sport Running Shoes</h3>
+                    <div class="product-price">$79.00</div>
+                    <button class="add-to-cart" onclick="addToCart('Sport Running Shoes', 79)">Add to Cart</button>
+                </div>
+            </div>
+            <div class="product-card" data-name="Vintage Camera">
+                <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=500&q=80" alt="Product" class="product-img">
+                <div class="product-info">
+                    <h3 class="product-title">Vintage Camera</h3>
+                    <div class="product-price">$299.00</div>
+                    <button class="add-to-cart" onclick="addToCart('Vintage Camera', 299)">Add to Cart</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <footer>
-        <p>&copy; 2026 Apache Shop. All rights reserved.</p>
-    </footer>
+    <!-- Bottom Liquid Glass Navigation Bar -->
+    <div class="nav-container-bottom">
+        <nav class="liquid-nav">
+            <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i><span>Home</span></a>
+            <a href="shop.html" class="nav-item active"><i class="fa-solid fa-list"></i><span>Category</span></a>
+            <a href="cart.html" class="nav-item"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span> <span id="cartCount" class="badge">0</span></a>
+            <a href="account.html" class="nav-item"><i class="fa-solid fa-user"></i><span>Account</span></a>
+        </nav>
+    </div>
 
     <script src="script.js"></script>
 </body>
