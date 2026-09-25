@@ -8,96 +8,129 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            background: linear-gradient(135deg, #0b0f19 0%, #111827 100%);
+            background: #0f172a;
             color: #f8fafc;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding-bottom: 110px;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+        }
+        /* Top Header */
+        .cart-header {
+            padding: 20px;
+            background: #0b0f19;
+            text-align: center;
+            font-size: 22px;
+            font-weight: 700;
+            color: #ffffff;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        /* Cart Container */
+        .cart-container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 20px;
         }
         .cart-card {
-            width: 100%;
-            max-width: 410px;
-            margin: 20px auto;
-            padding: 40px 30px;
-            background: rgba(17, 24, 39, 0.65);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 28px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            box-sizing: border-box;
-            text-align: center;
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
         }
-        /* Cart Button Animation Styles */
-        .cart-btn {
-            position: relative;
-            width: 100%;
-            padding: 16px 20px;
-            background: #ffffff;
-            color: #0f172a;
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        .item-info h4 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+            color: #ffffff;
+        }
+        .item-info p {
+            margin: 0;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        .item-price {
+            font-size: 16px;
+            font-weight: 600;
+            color: #38bdf8;
+        }
+        /* Cart Summary Box */
+        .cart-summary {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+        .total-price {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+        .total-price span {
+            color: #38bdf8;
+        }
+        .checkout-btn {
+            background: #ef4444;
+            color: #ffffff;
             border: none;
+            width: 100%;
+            padding: 14px;
             border-radius: 16px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.15);
-            overflow: hidden;
-            transition: transform 0.2s ease, background 0.3s;
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+            transition: transform 0.2s;
         }
-        .cart-btn:hover {
-            background: #f1f5f9;
-        }
-        .cart-btn:active {
-            transform: scale(0.97);
-        }
-        .cart-btn svg {
-            width: 22px;
-            height: 22px;
-            fill: currentColor;
-            transition: transform 0.3s ease;
-        }
-        /* Animation class when added to cart */
-        .cart-btn.cart-animation {
-            animation: cartBtnAnim 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-        @keyframes cartBtnAnim {
-            0%, 100% { transform: scale(1); }
-            40% { transform: scale(0.93); background: #38bdf8; color: #fff; }
-        }
-        .cart-count-text {
-            margin-top: 25px;
-            font-size: 15px;
-            color: #94a3b8;
-            font-weight: 500;
-        }
-        .cart-count-text span {
-            color: #ffffff;
-            font-weight: 600;
+        .checkout-btn:hover {
+            transform: scale(1.02);
         }
     </style>
 </head>
 <body>
 
-    <div class="cart-card">
-        <!-- Interactive Add to Cart Button matching the video -->
-        <button class="cart-btn" id="addToCartBtn">
-            <svg viewBox="0 0 24 24">
-                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
-            </svg>
-            <span class="cart-pill-label">Add to Cart</span>
-        </button>
+    <div class="cart-header">Your Shopping Cart</div>
 
-        <div class="cart-count-text" id="cartStatusText">
-            <span>0</span> in your cart
+    <div class="cart-container">
+        <!-- Cart Items List -->
+        <div class="cart-card">
+            <div class="cart-item">
+                <div class="item-info">
+                    <h4>Wireless Headphones</h4>
+                    <p>$99.00 x 1</p>
+                </div>
+                <div class="item-price">$99.00</div>
+            </div>
+            <div class="cart-item">
+                <div class="item-info">
+                    <h4>Minimalist Watch</h4>
+                    <p>$149.00 x 2</p>
+                </div>
+                <div class="item-price">$298.00</div>
+            </div>
+        </div>
+
+        <!-- Summary & Checkout -->
+        <div class="cart-summary">
+            <div class="total-price">Total Price: <span>$397.00</span></div>
+            <button class="checkout-btn">Proceed to Checkout</button>
         </div>
     </div>
 
@@ -111,30 +144,5 @@
         </nav>
     </div>
 
-    <script>
-        // Add to Cart interactive click animation matching video
-        const addToCartBtn = document.getElementById('addToCartBtn');
-        const cartStatusText = document.getElementById('cartStatusText');
-        let count = 0;
-
-        addToCartBtn.addEventListener('click', function() {
-            if (this.classList.contains('cart-animation')) return;
-            
-            this.classList.add('cart-animation');
-            count++;
-            
-            setTimeout(() => {
-                if(count === 1) {
-                    cartStatusText.innerHTML = `<span>${count}</span> in your cart`;
-                } else {
-                    cartStatusText.innerHTML = `<span>${count}</span> in your cart`;
-                }
-            }, 300);
-
-            setTimeout(() => {
-                this.classList.remove('cart-animation');
-            }, 800);
-        });
-    </script>
 </body>
 </html>
