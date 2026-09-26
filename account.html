@@ -10,7 +10,7 @@
 </head>
 <body>
 
-    <div class="auth-container">
+    <div class="auth-container" id="authPanel">
         <div class="avatar-container">
             <i class="fa-solid fa-bag-shopping"></i>
         </div>
@@ -49,9 +49,9 @@ const app=initializeApp({apiKey:"AIzaSyCDm9zVG4V1hzVUHt7o6RK9NzWzVblh5Hs",authDo
 const auth=getAuth(app), msg=t=>document.getElementById("authMessage").textContent=t||"";
 const persist=()=>setPersistence(auth,document.getElementById("rememberMe").checked?browserLocalPersistence:browserSessionPersistence);
 document.getElementById("togglePassword").onclick=()=>{const p=document.getElementById("loginPassword");p.type=p.type==="password"?"text":"password"};
-document.getElementById("loginForm").onsubmit=async e=>{e.preventDefault();try{await persist();await signInWithEmailAndPassword(auth,loginEmail.value.trim(),loginPassword.value)}catch(x){msg(x.message||"Sign in failed.")}};
-document.getElementById("createAccount").onclick=async e=>{e.preventDefault();try{await persist();await createUserWithEmailAndPassword(auth,loginEmail.value.trim(),loginPassword.value)}catch(x){msg(x.message||"Account creation failed.")}};
-document.getElementById("forgotPassword").onclick=async e=>{e.preventDefault();try{await sendPasswordResetEmail(auth,loginEmail.value.trim());msg("Password reset email sent.")}catch(x){msg(x.message||"Reset failed.")}};
+document.getElementById("loginForm").onsubmit=async e=>{e.preventDefault();try{await persist();await signInWithEmailAndPassword(auth,document.getElementById("loginEmail").value.trim(),document.getElementById("loginPassword").value)}catch(x){msg(x.message||"Sign in failed.")}};
+document.getElementById("createAccount").onclick=async e=>{e.preventDefault();try{await persist();await createUserWithEmailAndPassword(auth,document.getElementById("loginEmail").value.trim(),document.getElementById("loginPassword").value)}catch(x){msg(x.message||"Account creation failed.")}};
+document.getElementById("forgotPassword").onclick=async e=>{e.preventDefault();try{await sendPasswordResetEmail(auth,document.getElementById("loginEmail").value.trim());msg("Password reset email sent.")}catch(x){msg(x.message||"Reset failed.")}};
 document.getElementById("googleLoginBtn").onclick=async()=>{try{await persist();await signInWithPopup(auth,new GoogleAuthProvider())}catch(x){msg(x.message||"Google sign in failed.")}};
 onAuthStateChanged(auth,u=>{document.getElementById("authPanel").style.display=u?"none":"block";if(document.getElementById("userPanel"))document.getElementById("userPanel").style.display=u?"block":"none";if(u){document.getElementById("userName").textContent=u.displayName||"Welcome";document.getElementById("userEmail").textContent=u.email||""}});
 document.getElementById("logoutBtn")?.addEventListener("click",()=>signOut(auth));
