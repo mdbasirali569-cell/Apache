@@ -12,15 +12,9 @@
     <div class="container">
         <h2 class="section-title">Checkout</h2>
         
-        <div style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); padding: 25px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-            <h3>Order Summary</h3>
-            <div id="checkoutItems" style="margin: 15px 0;"></div>
-            <h4 id="checkoutTotal" style="margin-top: 15px;"></h4>
-        </div>
-
-        <div style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+        <div class="cart-card"><h3>Order Summary</h3><div id="checkoutItems"></div><h4 id="checkoutTotal"></h4></div><div class="cart-card"> rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
             <h3>Shipping Details</h3>
-            <form id="orderForm" style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
+            <form id="orderForm">
                 <input type="text" id="name" placeholder="Full Name" required style="padding: 12px; border-radius: 8px; border: 1px solid #ccc;">
                 <input type="text" id="phone" placeholder="Phone Number" required style="padding: 12px; border-radius: 8px; border: 1px solid #ccc;">
                 <textarea id="address" placeholder="Delivery Address" required style="padding: 12px; border-radius: 8px; border: 1px solid #ccc; height: 80px;"></textarea>
