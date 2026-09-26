@@ -46,6 +46,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import { getAuth,onAuthStateChanged,signInWithEmailAndPassword,createUserWithEmailAndPassword,sendPasswordResetEmail,GoogleAuthProvider,signInWithPopup,signOut,setPersistence,browserLocalPersistence,browserSessionPersistence } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 import { getFirestore,doc,setDoc,getDocs,collection,query,where } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import { getFirestore,doc,setDoc,getDocs,collection,query,where } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 const app=initializeApp({apiKey:"AIzaSyCDm9zVG4V1hzVUHt7o6RK9NzWzVblh5Hs",authDomain:"apache-shop.firebaseapp.com",projectId:"apache-shop",storageBucket:"apache-shop.firebasestorage.app",messagingSenderId:"40961890999",appId:"1:40961890999:web:5db3dc1001c1e81a97cb32"});
 const auth=getAuth(app),db=getFirestore(app),msg=t=>document.getElementById("authMessage").textContent=t||"";
 const persist=()=>setPersistence(auth,document.getElementById("rememberMe").checked?browserLocalPersistence:browserSessionPersistence);
