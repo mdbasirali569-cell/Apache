@@ -29,3 +29,6 @@
 
 /* Phase 6 - account orders */
 .orders-panel{margin:20px 0;text-align:left}.orders-panel h3{margin:0 0 12px}.order-card{padding:14px;margin:10px 0;border:1px solid rgba(255,255,255,.12);border-radius:16px;background:rgba(255,255,255,.06)}.order-card>div{display:flex;justify-content:space-between;gap:12px;align-items:center}.order-card p{font-size:13px;opacity:.8;line-height:1.5}.order-status{padding:4px 9px;border-radius:999px;background:rgba(255,255,255,.1);text-transform:capitalize;font-size:12px}.secure-note a{color:inherit;font-weight:700}
+
+/* Phase 6 - account orders */
+.orders-panel{margin:20px 0;text-align:left}.orders-panel h3{margin:0 0 12px}.order-card{padding:14px;margin:10px 0;border:1px solid rgba(255,255,255,.12);border-radius:16px;background:rgba(255,255,255,.06)}.order-card>div{display:flex;justify-content:space-between;gap:12px;align-items:center}.order-card p{font-size:13px;opacity:.8;line-height:1.5}.order-status{padding:4px 9px;border-radius:999px;background:rgba(255,255,255,.1);text-transform:capitalize;font-size:12px}.secure-note a{color:inherit;font-weight:700}
