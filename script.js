@@ -1,4 +1,5 @@
 const APACHE_CART_KEY="apacheCart";
+const APACHE_COUPON_KEY="apacheCoupon";
 const PRODUCTS=[
 {"id":"headphones","name":"Wireless Headphones","price":99,"oldPrice":129,"discount":23,"stock":18,"rating":4.8,"reviews":126,"category":"Audio","image":"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=85","description":"Immersive wireless audio with comfortable ear cushions, clear sound and all-day listening."},
 {"id":"watch","name":"Minimalist Watch","price":149,"oldPrice":199,"discount":25,"stock":9,"rating":4.7,"reviews":84,"category":"Fashion","image":"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=85","description":"A clean everyday watch with a timeless minimalist design."},
@@ -7,26 +8,111 @@ const PRODUCTS=[
 ];
 const PRODUCT_MAP=Object.fromEntries(PRODUCTS.map(p=>[p.id,p]));
 document.addEventListener("DOMContentLoaded",()=>{updateCartCount();displayCartItems();setupSearch();renderProductPage();setupAccountDemo();});
-function getCart(){try{return JSON.parse(localStorage.getItem(APACHE_CART_KEY))||[]}catch{return[]}}
-function saveCart(cart){localStorage.setItem(APACHE_CART_KEY,JSON.stringify(cart));updateCartCount()}
-function addToCart(idOrName,price,image){const p=PRODUCT_MAP[idOrName]||PRODUCTS.find(x=>x.name===idOrName)||{id:idOrName,name:idOrName,price:Number(price)||0,image:image||""};const cart=getCart(),item=cart.find(x=>x.id===p.id||x.name===p.name);if(item)item.quantity+=1;else cart.push({id:p.id,name:p.name,price:Number(p.price),image:p.image,quantity:1});saveCart(cart);showToast(p.name+" added to cart")}
-function updateCartCount(){const n=getCart().reduce((s,x)=>s+Number(x.quantity||0),0);document.querySelectorAll("#cartCount").forEach(e=>e.textContent=n)}
-function changeQuantity(id,delta){const cart=getCart(),item=cart.find(x=>x.id===id||x.name===id);if(!item)return;item.quantity+=delta;if(item.quantity<=0)saveCart(cart.filter(x=>x!==item));else saveCart(cart);displayCartItems()}
-function removeFromCart(id){saveCart(getCart().filter(x=>x.id!==id&&x.name!==id));displayCartItems();showToast("Item removed")}
-function displayCartItems(){const c=document.getElementById("cartItemsContainer"),t=document.getElementById("cartTotal");if(!c)return;const cart=getCart();if(!cart.length){c.innerHTML='<div class="empty-cart"><i class="fa-solid fa-cart-shopping"></i><h3>Your cart is empty</h3><p>Add products to start shopping.</p><a href="shop.html">Continue Shopping</a></div>';if(t)t.innerHTML='<div class="summary-lines"><div><span>Subtotal</span><b>$0.00</b></div><div><span>Shipping</span><b>$0.00</b></div><div class="grand"><span>Total</span><b>$0.00</b></div></div>';return}let html="",subtotal=0;cart.forEach(item=>{const p=Number(item.price)||0,q=Number(item.quantity)||1,sum=p*q;subtotal+=sum;const key=escapeAttr(item.id||item.name);html+='<div class="cart-item"><div class="item-info"><img src="'+(item.image||"")+'" alt="'+escapeHtml(item.name)+'"><div><h4>'+escapeHtml(item.name)+'</h4><p>$'+p.toFixed(2)+' each</p></div></div><div class="quantity-controls"><button onclick="changeQuantity(\\''+key+'\\',-1)">−</button><span>'+q+'</span><button onclick="changeQuantity(\\''+key+'\\',1)">+</button></div><div class="item-price">$'+sum.toFixed(2)+'</div><button class="remove-item" onclick="removeFromCart(\\''+key+'\\')"><i class="fa-solid fa-trash"></i></button></div>'});c.innerHTML=html;const coupon=getCoupon(),discount=coupon==="APACHE10"?subtotal*.10:0,shipping=subtotal-discount>=150?0:10,total=subtotal-discount+shipping;if(t)t.innerHTML='<div class="summary-lines"><div><span>Subtotal</span><b>$'+subtotal.toFixed(2)+'</b></div>'+(discount?'<div class="discount-line"><span>Coupon (APACHE10)</span><b>−$'+discount.toFixed(2)+'</b></div>':'')+'<div><span>Shipping</span><b>'+(shipping===0?"FREE":"$"+shipping.toFixed(2))+'</b></div><div class="grand"><span>Total</span><b>$'+total.toFixed(2)+'</b></div></div><div class="coupon-box"><input id="couponInput" value="'+coupon+'" placeholder="Coupon code"><button onclick="applyCoupon(document.getElementById(\'couponInput\').value)">Apply</button></div>'+(coupon?'<button class="clear-coupon" onclick="clearCoupon()">Remove coupon</button>':'')}
-function setupSearch(){const i=document.getElementById("searchInput");if(i)i.addEventListener("input",searchProducts)}
-function searchProducts(){const i=document.getElementById("searchInput");if(!i)return;const f=i.value.trim().toLowerCase();document.querySelectorAll(".product-card").forEach(c=>c.style.display=(c.dataset.name||"").toLowerCase().includes(f)?"":"none")}
-function showToast(m){const t=document.getElementById("toast-container"),x=document.getElementById("toast-message");if(!t||!x)return;x.textContent=m;t.classList.add("show");clearTimeout(window.apacheToastTimer);window.apacheToastTimer=setTimeout(()=>t.classList.remove("show"),2200)}
-function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
-function escapeAttr(v){return String(v).replace(/'/g,"\\'")}
-function productCard(p){return '<article class="product-card" data-name="'+escapeHtml(p.name)+'"><a class="product-link" href="product.html?id='+encodeURIComponent(p.id)+'"><div class="product-media"><img class="product-image" src="'+p.image+'" alt="'+escapeHtml(p.name)+'"><span class="discount-badge">-'+p.discount+'%</span></div></a><div class="product-content"><div class="product-category">'+escapeHtml(p.category)+'</div><a class="product-title" href="product.html?id='+encodeURIComponent(p.id)+'">'+escapeHtml(p.name)+'</a><div class="rating"><span>★★★★★</span> '+p.rating+' <small>('+p.reviews+')</small></div><div class="price-row"><strong>$'+p.price.toFixed(2)+'</strong><del>$'+p.oldPrice.toFixed(2)+'</del></div><div class="stock '+(p.stock<10?"low":"")+'">'+(p.stock<10?"Only "+p.stock+" left":"In stock")+'</div><div class="product-actions"><button class="add-to-cart-btn" onclick="addToCart(\''+p.id+'\')">Add to Cart</button><button class="wishlist-btn" aria-label="Wishlist" onclick="toggleWishlist(\''+p.id+'\',this)"><i class="fa-regular fa-heart"></i></button></div></div></article>'}
-function renderProductPage(){const el=document.getElementById("productDetail");if(!el)return;const id=new URLSearchParams(location.search).get("id")||PRODUCTS[0].id,p=PRODUCT_MAP[id]||PRODUCTS[0];el.innerHTML='<div class="product-detail-card"><div class="detail-media"><img src="'+p.image+'" alt="'+escapeHtml(p.name)+'"><span class="discount-badge">-'+p.discount+'%</span></div><div class="detail-info"><div class="product-category">'+escapeHtml(p.category)+'</div><h1>'+escapeHtml(p.name)+'</h1><div class="rating"><span>★★★★★</span> '+p.rating+' <small>('+p.reviews+' reviews)</small></div><div class="detail-price">$'+p.price.toFixed(2)+' <del>$'+p.oldPrice.toFixed(2)+'</del></div><p>'+escapeHtml(p.description)+'</p><div class="detail-stock '+(p.stock<10?"low":"")+'"><i class="fa-solid fa-circle"></i> '+(p.stock<10?"Only "+p.stock+" left in stock":"In stock and ready to ship")+'</div><div class="detail-actions"><button class="checkout-btn" onclick="addToCart(\''+p.id+'\')">Add to Cart</button><button class="wishlist-large" onclick="toggleWishlist(\''+p.id+'\',this)"><i class="fa-regular fa-heart"></i> Wishlist</button></div></div></div><h2 class="section-title related-heading">You may also like</h2><div class="products-container related-grid">'+PRODUCTS.filter(x=>x.id!==p.id).slice(0,3).map(productCard).join("")+'</div>'}
-function toggleWishlist(id,btn){let w=JSON.parse(localStorage.getItem("apacheWishlist")||"[]");if(w.includes(id)){w=w.filter(x=>x!==id);btn.classList.remove("saved");btn.innerHTML=btn.classList.contains("wishlist-large")?'<i class="fa-regular fa-heart"></i> Wishlist':'<i class="fa-regular fa-heart"></i>'}else{w.push(id);btn.classList.add("saved");btn.innerHTML=btn.classList.contains("wishlist-large")?'<i class="fa-solid fa-heart"></i> Saved':'<i class="fa-solid fa-heart"></i>'}localStorage.setItem("apacheWishlist",JSON.stringify(w))}
-function setupAccountDemo(){/* Firebase Authentication is initialized on account.html. */}
 
-const APACHE_COUPON_KEY="apacheCoupon";
+function getCart(){
+  try{
+    const raw=JSON.parse(localStorage.getItem(APACHE_CART_KEY)||"[]");
+    if(!Array.isArray(raw)) return [];
+    return raw.map(normalizeCartItem).filter(Boolean);
+  }catch{return[]}
+}
+function normalizeCartItem(item){
+  const p=PRODUCT_MAP[item?.id]||PRODUCTS.find(x=>x.name===item?.name);
+  if(!p)return null;
+  const quantity=Math.max(1,Math.min(p.stock,Math.floor(Number(item.quantity)||1)));
+  return {id:p.id,name:p.name,price:Number(p.price),image:p.image,quantity};
+}
+function saveCart(cart){
+  const clean=(Array.isArray(cart)?cart:[]).map(normalizeCartItem).filter(Boolean);
+  localStorage.setItem(APACHE_CART_KEY,JSON.stringify(clean));
+  updateCartCount();
+}
+function addToCart(idOrName){
+  const p=PRODUCT_MAP[idOrName]||PRODUCTS.find(x=>x.name===idOrName);
+  if(!p){showToast("Product unavailable");return}
+  const cart=getCart(),item=cart.find(x=>x.id===p.id);
+  if(item){
+    if(item.quantity>=p.stock){showToast("Maximum stock reached");return}
+    item.quantity+=1;
+  }else cart.push({id:p.id,name:p.name,price:p.price,image:p.image,quantity:1});
+  saveCart(cart);showToast(p.name+" added to cart");
+}
+function updateCartCount(){
+  const n=getCart().reduce((s,x)=>s+Number(x.quantity||0),0);
+  document.querySelectorAll("#cartCount").forEach(e=>e.textContent=n);
+}
+function changeQuantity(id,delta){
+  const cart=getCart(),item=cart.find(x=>x.id===id);
+  if(!item)return;
+  const p=PRODUCT_MAP[item.id];
+  item.quantity=Math.max(0,Math.min(p.stock,item.quantity+delta));
+  saveCart(item.quantity?cart:cart.filter(x=>x.id!==id));
+  displayCartItems();
+}
+function removeFromCart(id){
+  saveCart(getCart().filter(x=>x.id!==id));
+  displayCartItems();showToast("Item removed");
+}
 function getCoupon(){return localStorage.getItem(APACHE_COUPON_KEY)||""}
-function getCartTotals(){const cart=getCart();const subtotal=cart.reduce((s,i)=>s+(Number(i.price)||0)*(Number(i.quantity)||0),0);const coupon=getCoupon();const discount=coupon==="APACHE10"?subtotal*.10:0;const shipping=subtotal===0?0:(subtotal-discount)>=150?0:10;return{subtotal,discount,shipping,total:Math.max(0,subtotal-discount+shipping),coupon}}
-function applyCoupon(code){const c=String(code||"").trim().toUpperCase();if(c==="APACHE10"){localStorage.setItem(APACHE_COUPON_KEY,c);showToast("10% discount applied")}else{localStorage.removeItem(APACHE_COUPON_KEY);showToast("Invalid coupon code")}displayCartItems();if(typeof renderCheckout==="function")renderCheckout()}
-function clearCoupon(){localStorage.removeItem(APACHE_COUPON_KEY);displayCartItems();if(typeof renderCheckout==="function")renderCheckout()}
-function displayCartItems(){const c=document.getElementById("cartItemsContainer"),t=document.getElementById("cartTotal");if(!c)return;const cart=getCart();if(!cart.length){c.innerHTML='<div class="empty-cart"><i class="fa-solid fa-cart-shopping"></i><h3>Your cart is empty</h3><p>Add products to start shopping.</p><a href="shop.html">Continue Shopping</a></div>';if(t)t.innerHTML='<div class="summary-lines"><div><span>Subtotal</span><b>$0.00</b></div><div><span>Shipping</span><b>$0.00</b></div><div class="grand"><span>Total</span><b>$0.00</b></div></div>';return}let html="",subtotal=0;cart.forEach(item=>{const p=Number(item.price)||0,q=Number(item.quantity)||1,sum=p*q;subtotal+=sum;const key=escapeAttr(item.id||item.name);html+='<div class="cart-item"><div class="item-info"><img src="'+(item.image||"")+'" alt="'+escapeHtml(item.name)+'"><div><h4>'+escapeHtml(item.name)+'</h4><p>$'+p.toFixed(2)+' each</p></div></div><div class="quantity-controls"><button onclick="changeQuantity(\\''+key+'\\',-1)">−</button><span>'+q+'</span><button onclick="changeQuantity(\\''+key+'\\',1)">+</button></div><div class="item-price">$'+sum.toFixed(2)+'</div><button class="remove-item" onclick="removeFromCart(\\''+key+'\\')"><i class="fa-solid fa-trash"></i></button></div>'});c.innerHTML=html;const coupon=getCoupon();const discount=coupon==="APACHE10"?subtotal*.10:0;const shipping=subtotal-discount>=150?0:10;const total=subtotal-discount+shipping;if(t)t.innerHTML='<div class="summary-lines"><div><span>Subtotal</span><b>$'+subtotal.toFixed(2)+'</b></div>'+(discount?'<div class="discount-line"><span>Coupon (APACHE10)</span><b>−$'+discount.toFixed(2)+'</b></div>':'')+'<div><span>Shipping</span><b>'+(shipping===0?"FREE":"$"+shipping.toFixed(2))+'</b></div><div class="grand"><span>Total</span><b>$'+total.toFixed(2)+'</b></div></div><div class="coupon-box"><input id="couponInput" value="'+coupon+'" placeholder="Coupon code"><button onclick="applyCoupon(document.getElementById(\\'couponInput\\').value)">Apply</button></div>'+(coupon?'<button class="clear-coupon" onclick="clearCoupon()">Remove coupon</button>':'')}
+function getCartTotals(){
+  const cart=getCart();
+  const subtotal=cart.reduce((s,i)=>s+(Number(i.price)||0)*(Number(i.quantity)||0),0);
+  const coupon=getCoupon(),discount=coupon==="APACHE10"?subtotal*.10:0;
+  const shipping=subtotal===0?0:(subtotal-discount)>=150?0:10;
+  return{subtotal,discount,shipping,total:Math.max(0,subtotal-discount+shipping),coupon};
+}
+function displayCartItems(){
+  const c=document.getElementById("cartItemsContainer"),t=document.getElementById("cartTotal");
+  if(!c)return;
+  const cart=getCart();
+  if(!cart.length){
+    c.innerHTML='<div class="empty-cart"><i class="fa-solid fa-cart-shopping"></i><h3>Your cart is empty</h3><p>Add products to start shopping.</p><a href="shop.html">Continue Shopping</a></div>';
+    if(t)t.innerHTML='<div class="summary-lines"><div><span>Subtotal</span><b>$0.00</b></div><div><span>Shipping</span><b>$0.00</b></div><div class="grand"><span>Total</span><b>$0.00</b></div></div>';
+    return;
+  }
+  let html="";
+  cart.forEach(item=>{
+    const p=PRODUCT_MAP[item.id],q=item.quantity,sum=p.price*q,key=escapeAttr(item.id);
+    html+='<div class="cart-item"><div class="item-info"><img src="'+p.image+'" alt="'+escapeHtml(p.name)+'"><div><h4>'+escapeHtml(p.name)+'</h4><p>$'+p.price.toFixed(2)+' each</p></div></div><div class="quantity-controls"><button onclick="changeQuantity(\\''+key+'\\',-1)">−</button><span>'+q+'</span><button onclick="changeQuantity(\\''+key+'\\',1)">+</button></div><div class="item-price">$'+sum.toFixed(2)+'</div><button class="remove-item" onclick="removeFromCart(\\''+key+'\\')"><i class="fa-solid fa-trash"></i></button></div>';
+  });
+  c.innerHTML=html;
+  const coupon=getCoupon(),tots=getCartTotals();
+  if(t)t.innerHTML='<div class="summary-lines"><div><span>Subtotal</span><b>$'+tots.subtotal.toFixed(2)+'</b></div>'+(tots.discount?'<div class="discount-line"><span>Coupon (APACHE10)</span><b>−$'+tots.discount.toFixed(2)+'</b></div>':'')+'<div><span>Shipping</span><b>'+(tots.shipping===0?"FREE":"$"+tots.shipping.toFixed(2))+'</b></div><div class="grand"><span>Total</span><b>$'+tots.total.toFixed(2)+'</b></div></div><div class="coupon-box"><input id="couponInput" value="'+escapeAttr(coupon)+'" maxlength="20" placeholder="Coupon code"><button onclick="applyCoupon(document.getElementById(\\'couponInput\\').value)">Apply</button></div>'+(coupon?'<button class="clear-coupon" onclick="clearCoupon()">Remove coupon</button>':'');
+}
+function applyCoupon(code){
+  const c=String(code||"").trim().toUpperCase();
+  if(c==="APACHE10"){localStorage.setItem(APACHE_COUPON_KEY,c);showToast("10% discount applied")}
+  else{localStorage.removeItem(APACHE_COUPON_KEY);showToast("Invalid coupon code")}
+  displayCartItems();
+}
+function clearCoupon(){localStorage.removeItem(APACHE_COUPON_KEY);displayCartItems()}
+function setupSearch(){
+  const i=document.getElementById("searchInput");if(i)i.addEventListener("input",searchProducts);
+}
+function searchProducts(){
+  const i=document.getElementById("searchInput");if(!i)return;
+  const f=i.value.trim().toLowerCase();
+  document.querySelectorAll(".product-card").forEach(c=>c.style.display=(c.dataset.name||"").toLowerCase().includes(f)?"":"none");
+}
+function showToast(m){
+  const t=document.getElementById("toast-container"),x=document.getElementById("toast-message");if(!t||!x)return;
+  x.textContent=m;t.classList.add("show");clearTimeout(window.apacheToastTimer);
+  window.apacheToastTimer=setTimeout(()=>t.classList.remove("show"),2200);
+}
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function escapeAttr(v){return String(v).replace(/'/g,"\\'").replace(/"/g,"&quot;")}
+function productCard(p){
+  return '<article class="product-card" data-name="'+escapeHtml(p.name)+'"><a class="product-link" href="product.html?id='+encodeURIComponent(p.id)+'"><div class="product-media"><img class="product-image" src="'+p.image+'" alt="'+escapeHtml(p.name)+'" loading="lazy"><span class="discount-badge">-'+p.discount+'%</span></div></a><div class="product-content"><div class="product-category">'+escapeHtml(p.category)+'</div><a class="product-title" href="product.html?id='+encodeURIComponent(p.id)+'">'+escapeHtml(p.name)+'</a><div class="rating"><span>★★★★★</span> '+p.rating+' <small>('+p.reviews+')</small></div><div class="price-row"><strong>$'+p.price.toFixed(2)+'</strong><del>$'+p.oldPrice.toFixed(2)+'</del></div><div class="stock '+(p.stock<10?"low":"")+'">'+(p.stock<10?"Only "+p.stock+" left":"In stock")+'</div><div class="product-actions"><button class="add-to-cart-btn" onclick="addToCart(\\''+p.id+'\\')">Add to Cart</button><button class="wishlist-btn" aria-label="Wishlist" onclick="toggleWishlist(\\''+p.id+'\\',this)"><i class="fa-regular fa-heart"></i></button></div></div></article>';
+}
+function renderProductPage(){
+  const el=document.getElementById("productDetail");if(!el)return;
+  const id=new URLSearchParams(location.search).get("id")||PRODUCTS[0].id,p=PRODUCT_MAP[id]||PRODUCTS[0];
+  el.innerHTML='<div class="product-detail-card"><div class="detail-media"><img src="'+p.image+'" alt="'+escapeHtml(p.name)+'" loading="eager"><span class="discount-badge">-'+p.discount+'%</span></div><div class="detail-info"><div class="product-category">'+escapeHtml(p.category)+'</div><h1>'+escapeHtml(p.name)+'</h1><div class="rating"><span>★★★★★</span> '+p.rating+' <small>('+p.reviews+' reviews)</small></div><div class="detail-price">$'+p.price.toFixed(2)+' <del>$'+p.oldPrice.toFixed(2)+'</del></div><p>'+escapeHtml(p.description)+'</p><div class="detail-stock '+(p.stock<10?"low":"")+'"><i class="fa-solid fa-circle"></i> '+(p.stock<10?"Only "+p.stock+" left in stock":"In stock and ready to ship")+'</div><div class="detail-actions"><button class="checkout-btn" onclick="addToCart(\\''+p.id+'\\')">Add to Cart</button><button class="wishlist-large" onclick="toggleWishlist(\\''+p.id+'\\',this)"><i class="fa-regular fa-heart"></i> Wishlist</button></div></div></div><h2 class="section-title related-heading">You may also like</h2><div class="products-container related-grid">'+PRODUCTS.filter(x=>x.id!==p.id).slice(0,3).map(productCard).join("")+'</div>';
+}
+function toggleWishlist(id,btn){
+  let w=JSON.parse(localStorage.getItem("apacheWishlist")||"[]");
+  if(w.includes(id)){w=w.filter(x=>x!==id);btn.classList.remove("saved");btn.innerHTML=btn.classList.contains("wishlist-large")?'<i class="fa-regular fa-heart"></i> Wishlist':'<i class="fa-regular fa-heart"></i>'}
+  else{w.push(id);btn.classList.add("saved");btn.innerHTML=btn.classList.contains("wishlist-large")?'<i class="fa-solid fa-heart"></i> Saved':'<i class="fa-solid fa-heart"></i>'}
+  localStorage.setItem("apacheWishlist",JSON.stringify(w));
+}
+function setupAccountDemo(){/* Firebase Authentication is initialized on account.html. */}
