@@ -18,38 +18,17 @@
         <p class="auth-subtitle">Sign in to continue to your account</p>
         
         <form id="loginForm">
-            <div class="input-group">
-                <label>Email / Username</label>
-                <input type="email" id="loginEmail" placeholder="name@example.com" required>
-            </div>
-            <div class="input-group">
-                <label>Password</label>
-                <input type="password" id="loginPassword" placeholder="••••••••" required>
-                <i class="fa-regular fa-eye password-toggle" id="togglePassword"></i>
-            </div>
-            
-            <div class="auth-options">
-                <label><input type="checkbox"> Remember me</label>
-                <a href="#">Forgot password?</a>
-            </div>
-
-            <button type="submit" class="auth-btn">Sign in</button>
-        </form>
+<div class="input-group"><label>Email</label><input type="email" id="loginEmail" placeholder="name@example.com" required></div>
+<div class="input-group"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••" required><i class="fa-regular fa-eye password-toggle" id="togglePassword"></i></div>
+<div class="auth-options"><label><input type="checkbox" id="rememberMe"> Remember me</label><a href="#" id="forgotPassword">Forgot password?</a></div>
+<button type="submit" class="auth-btn" id="loginBtn">Sign in</button>
+</form>
 
         <div class="divider">or continue with</div>
 
-        <div class="social-buttons">
-            <button id="googleLoginBtn" class="social-btn">
-                <i class="fa-brands fa-google"></i> Google
-            </button>
-            <button class="social-btn">
-                <i class="fa-brands fa-apple"></i> Apple
-            </button>
-        </div>
+        <div class="social-buttons"><button id="googleLoginBtn" class="social-btn" type="button"><i class="fa-brands fa-google"></i> Google</button></div>
 
-        <div class="register-link">
-            New to Apache Shop? <a href="#">Create account</a>
-        </div>
+        <div class="register-link">New to Apache Shop? <a href="#" id="createAccount">Create account</a></div><p id="authMessage" class="auth-subtitle"></p>
     </div>
 
     <div class="nav-container-bottom">
@@ -61,17 +40,19 @@
         </nav>
     </div>
 
-    <script>
-        // Password visibility toggle feature
-        const togglePassword = document.getElementById('togglePassword');
-        const loginPassword = document.getElementById('loginPassword');
-
-        togglePassword.addEventListener('click', function () {
-            const type = loginPassword.getAttribute('type') === 'password' ? 'text' : 'password';
-            loginPassword.setAttribute('type', type);
-            this.classList.toggle('fa-eye');
-            this.classList.toggle('fa-eye-slash');
-        });
-    </script>
+    <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import { getAuth,onAuthStateChanged,signInWithEmailAndPassword,createUserWithEmailAndPassword,sendPasswordResetEmail,GoogleAuthProvider,signInWithPopup,signOut,setPersistence,browserLocalPersistence,browserSessionPersistence } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+const app=initializeApp({apiKey:"AIzaSyCDm9zVG4V1hzVUHt7o6RK9NzWzVblh5Hs",authDomain:"apache-shop.firebaseapp.com",projectId:"apache-shop",storageBucket:"apache-shop.firebasestorage.app",messagingSenderId:"40961890999",appId:"1:40961890999:web:5db3dc1001c1e81a97cb32"});
+const auth=getAuth(app), msg=t=>document.getElementById("authMessage").textContent=t||"";
+const persist=()=>setPersistence(auth,document.getElementById("rememberMe").checked?browserLocalPersistence:browserSessionPersistence);
+document.getElementById("togglePassword").onclick=()=>{const p=document.getElementById("loginPassword");p.type=p.type==="password"?"text":"password"};
+document.getElementById("loginForm").onsubmit=async e=>{e.preventDefault();try{await persist();await signInWithEmailAndPassword(auth,loginEmail.value.trim(),loginPassword.value)}catch(x){msg(x.message||"Sign in failed.")}};
+document.getElementById("createAccount").onclick=async e=>{e.preventDefault();try{await persist();await createUserWithEmailAndPassword(auth,loginEmail.value.trim(),loginPassword.value)}catch(x){msg(x.message||"Account creation failed.")}};
+document.getElementById("forgotPassword").onclick=async e=>{e.preventDefault();try{await sendPasswordResetEmail(auth,loginEmail.value.trim());msg("Password reset email sent.")}catch(x){msg(x.message||"Reset failed.")}};
+document.getElementById("googleLoginBtn").onclick=async()=>{try{await persist();await signInWithPopup(auth,new GoogleAuthProvider())}catch(x){msg(x.message||"Google sign in failed.")}};
+onAuthStateChanged(auth,u=>{document.getElementById("authPanel").style.display=u?"none":"block";if(document.getElementById("userPanel"))document.getElementById("userPanel").style.display=u?"block":"none";if(u){document.getElementById("userName").textContent=u.displayName||"Welcome";document.getElementById("userEmail").textContent=u.email||""}});
+document.getElementById("logoutBtn")?.addEventListener("click",()=>signOut(auth));
+</script>
 <script src="script.js"></script></body>
 </html>
