@@ -31,7 +31,7 @@
         <div class="register-link">New to Apache Shop? <a href="#" id="createAccount">Create account</a></div><p id="authMessage" class="auth-subtitle"></p>
     </div>
 
-    <div class="auth-container" id="userPanel" style="display:none"><div class="avatar-container"><i class="fa-solid fa-user"></i></div><h2 class="auth-title" id="userName">Welcome</h2><p class="auth-subtitle" id="userEmail"></p><button class="auth-btn" id="logoutBtn" type="button">Sign out</button></div>
+    <div class="auth-container" id="userPanel" style="display:none"><div class="avatar-container"><i class="fa-solid fa-user"></i></div><h2 class="auth-title" id="userName">Welcome</h2><p class="auth-subtitle" id="userEmail"></p><div id="ordersPanel" class="orders-panel"><h3>My Orders</h3><div id="ordersList"><p class="auth-subtitle">Loading orders...</p></div></div><button class="auth-btn" id="logoutBtn" type="button">Sign out</button></div>
 
     <div class="nav-container-bottom">
         <nav class="liquid-nav">
@@ -45,15 +45,17 @@
     <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import { getAuth,onAuthStateChanged,signInWithEmailAndPassword,createUserWithEmailAndPassword,sendPasswordResetEmail,GoogleAuthProvider,signInWithPopup,signOut,setPersistence,browserLocalPersistence,browserSessionPersistence } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import { getFirestore,doc,setDoc,getDocs,collection,query,where } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 const app=initializeApp({apiKey:"AIzaSyCDm9zVG4V1hzVUHt7o6RK9NzWzVblh5Hs",authDomain:"apache-shop.firebaseapp.com",projectId:"apache-shop",storageBucket:"apache-shop.firebasestorage.app",messagingSenderId:"40961890999",appId:"1:40961890999:web:5db3dc1001c1e81a97cb32"});
-const auth=getAuth(app), msg=t=>document.getElementById("authMessage").textContent=t||"";
+const auth=getAuth(app),db=getFirestore(app),msg=t=>document.getElementById("authMessage").textContent=t||"";
 const persist=()=>setPersistence(auth,document.getElementById("rememberMe").checked?browserLocalPersistence:browserSessionPersistence);
 document.getElementById("togglePassword").onclick=()=>{const p=document.getElementById("loginPassword");p.type=p.type==="password"?"text":"password"};
 document.getElementById("loginForm").onsubmit=async e=>{e.preventDefault();try{await persist();await signInWithEmailAndPassword(auth,document.getElementById("loginEmail").value.trim(),document.getElementById("loginPassword").value)}catch(x){msg(x.message||"Sign in failed.")}};
 document.getElementById("createAccount").onclick=async e=>{e.preventDefault();try{await persist();await createUserWithEmailAndPassword(auth,document.getElementById("loginEmail").value.trim(),document.getElementById("loginPassword").value)}catch(x){msg(x.message||"Account creation failed.")}};
 document.getElementById("forgotPassword").onclick=async e=>{e.preventDefault();try{await sendPasswordResetEmail(auth,document.getElementById("loginEmail").value.trim());msg("Password reset email sent.")}catch(x){msg(x.message||"Reset failed.")}};
 document.getElementById("googleLoginBtn").onclick=async()=>{try{await persist();await signInWithPopup(auth,new GoogleAuthProvider())}catch(x){msg(x.message||"Google sign in failed.")}};
-onAuthStateChanged(auth,u=>{document.getElementById("authPanel").style.display=u?"none":"block";if(document.getElementById("userPanel"))document.getElementById("userPanel").style.display=u?"block":"none";if(u){document.getElementById("userName").textContent=u.displayName||"Welcome";document.getElementById("userEmail").textContent=u.email||""}});
+onAuthStateChanged(auth,async u=>{document.getElementById("authPanel").style.display=u?"none":"block";if(document.getElementById("userPanel"))document.getElementById("userPanel").style.display=u?"block":"none";if(u){document.getElementById("userName").textContent=u.displayName||"Welcome";document.getElementById("userEmail").textContent=u.email||"";try{await setDoc(doc(db,"users",u.uid),{uid:u.uid,email:u.email||"",displayName:u.displayName||"",updatedAt:new Date()},{merge:true});await loadOrders(u.uid)}catch(err){console.error(err);document.getElementById("ordersList").innerHTML="<p class=\"auth-subtitle\">Could not load orders.</p>"}}});
+async function loadOrders(uid){const list=document.getElementById("ordersList");const snap=await getDocs(query(collection(db,"orders"),where("uid","==",uid)));const orders=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.timestamp?.seconds||0)-(a.timestamp?.seconds||0));if(!orders.length){list.innerHTML="<p class=\"auth-subtitle\">No orders yet.</p>";return}list.innerHTML=orders.map(o=>{const date=o.timestamp?.toDate?o.timestamp.toDate().toLocaleDateString():o.timestamp?.seconds?new Date(o.timestamp.seconds*1000).toLocaleDateString():"Pending";const items=(o.items||[]).map(i=>escapeHtml(i.name)+" × "+Number(i.quantity||0)).join(", ");return "<div class=\"order-card\"><div><strong>Order #"+escapeHtml(o.id.slice(-8).toUpperCase())+"</strong><span>"+date+"</span></div><p>"+items+"</p><div><b>$"+Number(o.total||0).toFixed(2)+"</b><span class=\"order-status\">"+escapeHtml(o.status||"pending")+"</span></div></div>" }).join("")}
 document.getElementById("logoutBtn")?.addEventListener("click",()=>signOut(auth));
 </script>
 <script src="script.js"></script></body>
