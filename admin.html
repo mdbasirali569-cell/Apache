@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Apache Shop - Admin</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<main class="container admin-page">
+<header class="admin-head">
+  <div><span class="admin-kicker">APACHE SHOP</span><h1>Admin Dashboard</h1><p>Orders, payments and customer activity</p></div>
+  <button id="logoutAdmin" class="admin-ghost" type="button">Sign out</button>
+</header>
+<div id="adminMessage" class="admin-message">Checking administrator access…</div>
+<section id="adminApp" style="display:none">
+  <div class="admin-stats">
+    <div class="admin-stat"><span>Total Orders</span><strong id="statOrders">0</strong></div>
+    <div class="admin-stat"><span>Pending</span><strong id="statPending">0</strong></div>
+    <div class="admin-stat"><span>Revenue</span><strong id="statRevenue">$0.00</strong></div>
+    <div class="admin-stat"><span>Unpaid</span><strong id="statUnpaid">0</strong></div>
+  </div>
+  <section class="cart-card admin-orders">
+    <div class="admin-section-head"><h2>Orders</h2><button id="refreshOrders" class="admin-ghost" type="button"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
+    <div id="ordersTableWrap"></div>
+  </section>
+</section>
+</main>
+<div class="nav-container-bottom"><nav class="liquid-nav">
+<a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i><span>Home</span></a>
+<a href="shop.html" class="nav-item"><i class="fa-solid fa-list"></i><span>Category</span></a>
+<a href="cart.html" class="nav-item"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span></a>
+<a href="account.html" class="nav-item"><i class="fa-solid fa-user"></i><span>Account</span></a>
+</nav></div>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import{getFirestore,collection,getDocs,query,orderBy,doc,updateDoc}from"https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+const app=initializeApp({apiKey:"AIzaSyCDm9zVG4V1hzVUHt7o6RK9NzWzVblh5Hs",authDomain:"apache-shop.firebaseapp.com",projectId:"apache-shop",storageBucket:"apache-shop.firebasestorage.app",messagingSenderId:"40961890999",appId:"1:40961890999:web:5db3dc1001c1e81a97cb32"});
+const auth=getAuth(app),db=getFirestore(app);
+const msg=document.getElementById("adminMessage"),appEl=document.getElementById("adminApp");
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+const money=v=>"$"+Number(v||0).toFixed(2);
+function statusOptions(v){return["pending","confirmed","shipped","delivered","cancelled"].map(x=>"<option value='"+x+"' "+(x===v?"selected":"")+">"+x+"</option>").join("")}
+async function loadOrders(){
+ const snap=await getDocs(query(collection(db,"orders"),orderBy("timestamp","desc")));
+ const orders=snap.docs.map(d=>({id:d.id,...d.data()}));
+ document.getElementById("statOrders").textContent=orders.length;
+ document.getElementById("statPending").textContent=orders.filter(o=>o.status==="pending").length;
+ document.getElementById("statRevenue").textContent=money(orders.filter(o=>o.status!=="cancelled").reduce((s,o)=>s+Number(o.total||0),0));
+ document.getElementById("statUnpaid").textContent=orders.filter(o=>o.paymentStatus!=="paid"&&o.status!=="cancelled").length;
+ if(!orders.length){document.getElementById("ordersTableWrap").innerHTML="<div class='admin-empty'>No orders yet.</div>";return}
+ document.getElementById("ordersTableWrap").innerHTML="<div class='admin-table'>"+orders.map(o=>{
+   const items=(o.items||[]).map(i=>esc(i.name)+" × "+Number(i.quantity||0)).join(", ");
+   const date=o.timestamp?.toDate?o.timestamp.toDate().toLocaleString():"Pending";
+   return "<article class='admin-order'><div class='admin-order-main'><div><strong>#"+esc(o.id.slice(-8).toUpperCase())+"</strong><span>"+esc(date)+"</span></div><p>"+esc(o.customerName)+" · "+esc(o.customerEmail)+" · "+esc(o.phone)+"</p><p>"+items+"</p><p>"+esc(o.address)+"</p></div><div class='admin-order-side'><b>"+money(o.total)+"</b><small>"+esc(o.paymentMethod||"cod")+" · "+esc(o.paymentStatus||"unpaid")+"</small><label>Status<select data-order='"+esc(o.id)+"' class='status-select'>"+statusOptions(o.status||"pending")+"</select></label><label>Payment<select data-payment='"+esc(o.id)+"' class='payment-select'><option value='unpaid' "+(o.paymentStatus!=="paid"?"selected":"")+">unpaid</option><option value='paid' "+(o.paymentStatus==="paid"?"selected":"")+">paid</option></select></label></div></article>"
+ }).join("")+"</div>";
+ document.querySelectorAll(".status-select").forEach(el=>el.onchange=async()=>{await updateDoc(doc(db,"orders",el.dataset.order),{status:el.value});await loadOrders()});
+ document.querySelectorAll(".payment-select").forEach(el=>el.onchange=async()=>{await updateDoc(doc(db,"orders",el.dataset.payment),{paymentStatus:el.value});await loadOrders()});
+}
+onAuthStateChanged(auth,async user=>{
+ if(!user){msg.innerHTML='Please <a href="account.html">sign in</a> with an administrator account.';return}
+ const token=await user.getIdTokenResult(true);
+ if(token.claims.admin!==true){msg.textContent="Access denied. This account is not an administrator.";return}
+ msg.style.display="none";appEl.style.display="block";
+ try{await loadOrders()}catch(e){console.error(e);msg.style.display="block";msg.textContent="Could not load orders. Check Firestore indexes/rules."}
+});
+document.getElementById("refreshOrders").onclick=()=>loadOrders();
+document.getElementById("logoutAdmin").onclick=()=>signOut(auth);
+</script>
+</body>
+</html>
